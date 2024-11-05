@@ -37,7 +37,7 @@ function setup() {
   textFont(FONT_NAME);
   textSize(GRID_SIZE_Y);
   gameState.player.calculateLineOfSight(gameState.currentFloor());
-  updateLight(gameState.currentFloor());
+  updateLight(gameState.currentFloor(), gameState.player);
   gameState.player.calculateSight(gameState.currentFloor());
   render();
 }
@@ -92,7 +92,7 @@ function draw() {
         break;
     }
     gameState.player.calculateLineOfSight(gameState.currentFloor());
-    updateLight(gameState.currentFloor());
+    updateLight(gameState.currentFloor(), gameState.player);
     gameState.player.calculateSight(gameState.currentFloor());
     render();
   }

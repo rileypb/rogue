@@ -171,9 +171,9 @@ class FloorPlan {
     let x = Math.floor(this.width / 2);
     let y = Math.floor(this.height / 2);
     this.tiles[x + y * this.width] = new Lamp(x, y, color(255, 0, 0));
-    x = Math.floor(2*this.width / 3) - 8;
-    y = Math.floor(2*this.height / 3) - 2;
-    this.tiles[x + y * this.width] = new Lamp(x, y, color(255, 255, 0));
+    // x = Math.floor(2*this.width / 3) - 8;
+    // y = Math.floor(2*this.height / 3) - 2;
+    // this.tiles[x + y * this.width] = new Lamp(x, y, color(255, 255, 0));
 
     // place a wall near the lamp
     x = Math.floor(this.width / 2) + 2;
@@ -190,6 +190,8 @@ class FloorPlan {
     y = Math.floor(2*this.height / 3) - 3;
     this.tiles[x + y * this.width] = new Wall(x, y);
     this.tiles[x + (y - 1) * this.width] = new Wall(x, y - 1);
+    this.tiles[x + (y - 2) * this.width] = new Wall(x, y - 2);
+    this.tiles[x + (y - 3) * this.width] = new Wall(x, y - 3);
   }
 
 

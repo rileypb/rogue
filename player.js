@@ -27,13 +27,17 @@ class Player {
 				// if (dy == 0 && dx == -20) {
 				// 	let a = 0;
 				// }
-				let xx = Math.ceil(this.x - Math.cos(angle) * d);
-				let yy = Math.ceil(this.y - Math.sin(angle) * d);
+				let xx = Math.floor(tile.x + Math.cos(angle) * d);
+				let yy = Math.floor(tile.y + Math.sin(angle) * d);
 				if (dx < 0) {
-					xx = Math.floor(this.x - Math.cos(angle) * d);
+					xx = Math.ceil(tile.x + Math.cos(angle) * d);
 				}
 				if (dy < 0) {
-					yy = Math.floor(this.y - Math.sin(angle) * d);
+					yy = Math.ceil(tile.y + Math.sin(angle) * d);
+				}
+
+				if (xx < 0 || xx >= floorPlan.width || yy < 0 || yy >= floorPlan.height) {
+					break;
 				}
 				let traceTile = floorPlan.get(xx, yy);
 				traceTile.hasLineOfSight = true;

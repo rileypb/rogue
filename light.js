@@ -24,35 +24,38 @@ function updateLight(floorplan, player) {
 	for (let tile of floorplan.tiles) {
 		tile.light = color(0, 0, 0);
 	}
+	// cast player's torchlight
+	updateLightFromPosition(floorplan, player.x, player.y, new LightSource(color(255, 255, 255), 0.1));
+
 	// for each lamp, cast light
 	for (let tile of floorplan.tiles) {
 		if (tile.isLit()) {
-			updateLightFromTile(floorplan, tile);
+			updateLightFromPosition(floorplan, tile.x, tile.y, tile.lightSource);
 		}
 	}
 }
 
-function updateLightFromTile(floorplan, tile) {
-	for (let x = tile.x - MAX_LIGHT_DISTANCE; x <= tile.x + MAX_LIGHT_DISTANCE; x++) {
-		for (let y = tile.y - MAX_LIGHT_DISTANCE; y <= tile.y + MAX_LIGHT_DISTANCE; y++) {
-			let distance = Math.sqrt((x - tile.x) ** 2 + (y - tile.y) ** 2);
+function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
+	for (let x = lightX - MAX_LIGHT_DISTANCE; x <= lightX + MAX_LIGHT_DISTANCE; x++) {
+		for (let y = lightY - MAX_LIGHT_DISTANCE; y <= lightY + MAX_LIGHT_DISTANCE; y++) {
+			let distance = Math.sqrt((x - lightX) ** 2 + (y - lightY) ** 2);
 			if (distance > MAX_LIGHT_DISTANCE) {
 				continue;
 			}
-			let dx = x - tile.x;
-			let dy = y - tile.y;
+			let dx = x - lightX;
+			let dy = y - lightY;
 			let angle = Math.atan2(dy, dx);
 			// trace a ray from the target tile to the lamp
-			let light = tile.lightSource.getLight();
+			let light = lightSource.getLight();
 			blocked = false;
 			for (let d = 0; d <= distance; d++) {
-				let xx = Math.floor(tile.x + Math.cos(angle) * d);
-				let yy = Math.floor(tile.y + Math.sin(angle) * d);
+				let xx = Math.floor(lightX + Math.cos(angle) * d);
+				let yy = Math.floor(lightY + Math.sin(angle) * d);
 				if (dx < 0) {
-					xx = Math.ceil(tile.x + Math.cos(angle) * d);
+					xx = Math.ceil(lightX + Math.cos(angle) * d);
 				}
 				if (dy < 0) {
-					yy = Math.ceil(tile.y + Math.sin(angle) * d);
+					yy = Math.ceil(lightY + Math.sin(angle) * d);
 				}
 				let traceTile = floorplan.get(xx, yy);
 				if (!traceTile.isTransparent()) {
@@ -67,7 +70,7 @@ function updateLightFromTile(floorplan, tile) {
 			}
 		}
 
-		// mark all non-transparent tiles as having light if they are adjacent to a trasparent tile with light. The light should be the average of the adjacent lights.
+		// mark all non-transparent tiles as having light if they are adjacent to a transparent tile with light. The light should be the average of the adjacent lights.
 		for (let tile of floorplan.tiles) {
 			if (!tile.isTransparent()) {
 				let neighbors = floorplan.getNeighbors(tile.x, tile.y);
