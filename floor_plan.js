@@ -7,7 +7,7 @@ class Tile {
     this.feature = null;
 
     this.hasBeenSeen = false;
-    this.currentlyVisible = false;
+    this.visible = false;
     this.hasLineOfSight = false;
 
     this.isSpecial = false;
@@ -209,6 +209,9 @@ class Wall extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT) {
       fill(255);
       stroke(255);
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(MEMORY_LIGHT);
+      stroke(MEMORY_LIGHT);
     }
     text('#', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
   }
@@ -225,6 +228,9 @@ class Floor extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT) {
       fill(255);
       stroke(255);
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(MEMORY_LIGHT);
+      stroke(MEMORY_LIGHT);
     }
     text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
   }

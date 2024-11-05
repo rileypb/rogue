@@ -36,6 +36,7 @@ function setup() {
   setupGameState(gameState);
   textFont(FONT_NAME);
   textSize(GRID_SIZE_Y);
+  playerLightSource = new LightSource(color(255, 255, 128), 0.1);
   gameState.player.calculateLineOfSight(gameState.currentFloor());
   updateLight(gameState.currentFloor(), gameState.player);
   gameState.player.calculateSight(gameState.currentFloor());

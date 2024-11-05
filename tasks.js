@@ -67,6 +67,7 @@ class FlickerTask extends Task {
 
   run() {
 	this.floorPlan.updateFlicker();
+	playerLightSource.updateFlickerFactor();
 	updateLight(this.floorPlan, gameState.player);
 	render();
 	this.countdown = Math.floor(Math.random() * 30 + 1);

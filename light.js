@@ -1,6 +1,7 @@
 const LIGHT_FALL_OFF = 0.88;
 const LIGHT_THRESHOLD = 0.1;
 const MAX_LIGHT_DISTANCE = 10;
+const MEMORY_LIGHT = 50;
 
 class LightSource {
 	constructor(color, flicker) {
@@ -19,13 +20,15 @@ class LightSource {
 
 }
 
+let playerLightSource;
+
 function updateLight(floorplan, player) {
 	// reset light
 	for (let tile of floorplan.tiles) {
 		tile.light = color(0, 0, 0);
 	}
 	// cast player's torchlight
-	updateLightFromPosition(floorplan, player.x, player.y, new LightSource(color(255, 255, 255), 0.1));
+	updateLightFromPosition(floorplan, player.x, player.y, playerLightSource);
 
 	// for each lamp, cast light
 	for (let tile of floorplan.tiles) {
