@@ -101,3 +101,11 @@ function draw() {
 	}
 
 }
+
+function keyPressed() {
+	inputTask.emittedKeyCode = keyCode;
+	inputTask.repeating = true;
+	taskManager.tasks.push(inputTask);
+	// inputTask.run();
+
+}		

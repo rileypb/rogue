@@ -324,7 +324,7 @@ class Lamp extends Tile {
   constructor(x, y, color) {
     super(x, y);
     this.color = color;
-    this.lightSource = new LightSource(color, 0.06);
+    this.lightSource = new LightSource(color, 0.1);
   }
 
   render() {
