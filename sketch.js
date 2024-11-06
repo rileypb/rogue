@@ -3,6 +3,7 @@ let counterTask = new TestTask("Counter Task");
 let inputTask = new InputTask();
 let gameState = new GameState();
 let flickerTask;
+let autoMoveTask;
 
 const GRID_SIZE_X = 12;
 const GRID_SIZE_Y = 16;
@@ -30,10 +31,14 @@ VISIBLE = 2;
 RENDER_MODE = NORMAL;
 // RENDER_MODE = LINE_OF_SIGHT;
 
+let autoMoveInProgress = false;
+
 function setup() {
 	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 	taskManager.addTask(counterTask);
 	taskManager.addTask(inputTask);
+	autoMoveTask = new AutoMoveTask();
+	taskManager.addTask(autoMoveTask);
 	setupGameState(gameState);
 	textFont(FONT_NAME);
 	textSize(GRID_SIZE_Y);
@@ -103,6 +108,7 @@ function draw() {
 }
 
 function keyPressed() {
+	autoMoveInProgress = false;
 	inputTask.emittedKeyCode = keyCode;
 	inputTask.repeating = true;
 	taskManager.tasks.push(inputTask);

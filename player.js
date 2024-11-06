@@ -66,13 +66,15 @@ class Player {
 		let newY = this.y + dy;
 		let newTile = floorPlan.get(newX, newY);
 		if (newTile === null || newTile === undefined) {
-			return;
+			return false;
 		}
 		if (newTile.isEnterable()) {
 			this.x = newX;
 			this.y = newY;
 			newTile.onEnter(this);
+			return true;
 		}
+		return false;
 	}
 
 }
