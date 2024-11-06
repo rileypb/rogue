@@ -19,21 +19,22 @@ class Player {
 			}
 		}
 		for (let tile of floorPlan.tiles) {
-			let distance = Math.sqrt((tile.x - this.x) ** 2 + (tile.y - this.y) ** 2);
+			let distance = Math.ceil(Math.sqrt((tile.x - this.x) ** 2 + (tile.y - this.y) ** 2));
 			let dx = this.x - tile.x;
 			let dy = this.y - tile.y;
 			let angle = Math.atan2(dy, dx);
+			let blocked = false;
 			for (let d = 0; d <= distance; d++) {
 				// if (dy == 0 && dx == -20) {
 				// 	let a = 0;
 				// }
-				let xx = Math.floor(tile.x + Math.cos(angle) * d);
-				let yy = Math.floor(tile.y + Math.sin(angle) * d);
+				let xx = Math.ceil(this.x - Math.cos(angle) * d);
+				let yy = Math.ceil(this.y - Math.sin(angle) * d);
 				if (dx < 0) {
-					xx = Math.ceil(tile.x + Math.cos(angle) * d);
+					xx = Math.floor(this.x - Math.cos(angle) * d);
 				}
 				if (dy < 0) {
-					yy = Math.ceil(tile.y + Math.sin(angle) * d);
+					yy = Math.floor(this.y - Math.sin(angle) * d);
 				}
 
 				if (xx < 0 || xx >= floorPlan.width || yy < 0 || yy >= floorPlan.height) {
@@ -43,8 +44,12 @@ class Player {
 				traceTile.hasLineOfSight = true;
 				if (!traceTile.isTransparent()) {
 					break;
+					blocked = true;
 				}
 			}
+			// if (!blocked) {
+			// 	tile.hasLineOfSight = true;
+			// }
 		}
 		floorPlan.get(this.x, this.y).hasLineOfSight = true;
 	}

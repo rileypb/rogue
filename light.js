@@ -61,15 +61,17 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 					yy = Math.ceil(lightY + Math.sin(angle) * d);
 				}
 				let traceTile = floorplan.get(xx, yy);
-				if (!traceTile.isTransparent()) {
+				if (traceTile != null && traceTile != undefined && !traceTile.isTransparent()) {
 					blocked = true;
 					break;
 				}
 			}
 			if (!blocked) {
 				let floorTile = floorplan.get(x, y);
-				let existingLight = floorTile.light;
-				floorTile.light = color(existingLight._getRed() + light._getRed() * LIGHT_FALL_OFF ** distance, existingLight._getGreen() + light._getGreen() * LIGHT_FALL_OFF ** distance, existingLight._getBlue() + light._getBlue() * LIGHT_FALL_OFF ** distance);
+				if (floorTile != null) {
+					let existingLight = floorTile.light;
+					floorTile.light = color(existingLight._getRed() + light._getRed() * LIGHT_FALL_OFF ** distance, existingLight._getGreen() + light._getGreen() * LIGHT_FALL_OFF ** distance, existingLight._getBlue() + light._getBlue() * LIGHT_FALL_OFF ** distance);
+				}
 			}
 		}
 

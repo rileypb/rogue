@@ -75,6 +75,7 @@ class FloorPlan {
   DUNGEON = 1;
   MIX = 2;
   ONE_ROOM = 3;
+  RANDOM_WALLS = 4;
 
   constructor(width, height, floor) {
     this.width = width;
@@ -87,7 +88,7 @@ class FloorPlan {
       }
     }
     this.floorIndex = 0;
-    this.type = this.ONE_ROOM;
+    this.type = this.RANDOM_WALLS;
   }
 
   get(x, y) {
@@ -138,6 +139,9 @@ class FloorPlan {
       case this.ONE_ROOM:
         this.generateOneRoom();
         break;
+      case this.RANDOM_WALLS:
+        this.generateRandomWalls();
+        break;
     }
   }
 
@@ -152,8 +156,8 @@ class FloorPlan {
 
   generateOneRoom() {
     // fill with floor tiles
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
+    for (let x = 0; x < this.width+1; x++) {
+      for (let y = 0; y < this.height+1; y++) {
         this.tiles[x + y * this.width] = new Floor(x, y);
       }
     }
@@ -194,26 +198,77 @@ class FloorPlan {
     this.tiles[x + (y - 3) * this.width] = new Wall(x, y - 3);
   }
 
+  generateRandomWalls() {
+    // fill with floor tiles
+    for (let x = 0; x < this.width+1; x++) {
+      for (let y = 0; y < this.height+1; y++) {
+        this.tiles[x + y * this.width] = new Floor(x, y);
+      }
+    }
+    // bound the room with walls
+    for (let x = 0; x < this.width; x++) {
+      this.tiles[x] = new Wall(x, 0, Wall.WOOD);
+      this.tiles[x + (this.height - 1) * this.width] = new Wall(x, this.height - 1, Wall.WOOD);
+    }
+    for (let y = 0; y < this.height; y++) {
+      this.tiles[y * this.width] = new Wall(0, y, Wall.WOOD);
+      this.tiles[(this.width - 1) + y * this.width] = new Wall(this.width - 1, y, Wall.WOOD);
+    }
+    // create 10 walls of lengths 1-6
+    for (let i = 0; i < 40; i++) {
+      let x = Math.floor(Math.random() * this.width);
+      let y = Math.floor(Math.random() * this.height);
+      let dx = Math.floor(Math.random() * 6) + 1;
+      let dy = Math.floor(Math.random() * 6) + 1;
+      for (let xx = x; xx < x + dx; xx++) {
+        for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
+          this.tiles[xx + yy * this.width] = new Wall(xx, yy, Wall.WOOD);
+          
+        }
+      }
+      for (let tile of this.tiles) {
+        tile.x;
+      }
+    }
+    // create 5 random lamps
+    for (let i = 0; i < 5; i++) {
+      let x = Math.floor(Math.random() * this.width);
+      let y = Math.floor(Math.random() * this.height);
+      this.tiles[x + y * this.width] = new Lamp(x, y, color(Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)));
+    }
+  }
 
 
 }
 
 class Wall extends Tile {
-  constructor(x, y) {
+  STONE = 0;
+  WOOD = 1;
+  METAL = 2;
+
+  constructor(x, y, kind) {
     super(x, y);
+
+    this.kind = kind;
   }
 
   render() {
+    let resultingLight = this.light;
+    if (this.kind == this.WOOD) {
+      resultingLight = color(139, 69, 19);
+    }
+
     fill(this.light);
     stroke(this.light);
     if (RENDER_MODE == LINE_OF_SIGHT) {
       fill(255);
       stroke(255);
     } else if (this.hasBeenSeen && !this.visible) {
-      fill(MEMORY_LIGHT);
+      fill(0);
       stroke(MEMORY_LIGHT);
     }
-    text('#', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+    let char = '#';
+    text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
   }
 }
 
@@ -225,11 +280,11 @@ class Floor extends Tile {
   render() {
     fill(this.light);
     stroke(this.light);
-    if (RENDER_MODE == LINE_OF_SIGHT) {
+    if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
       fill(255);
       stroke(255);
     } else if (this.hasBeenSeen && !this.visible) {
-      fill(MEMORY_LIGHT);
+      fill(0);
       stroke(MEMORY_LIGHT);
     }
     text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
