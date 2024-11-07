@@ -22,6 +22,9 @@ class Player {
 			let distance = Math.ceil(Math.sqrt((tile.x - this.x) ** 2 + (tile.y - this.y) ** 2));
 			let dx = this.x - tile.x;
 			let dy = this.y - tile.y;
+			if (dy == 4 && dx == 3) {
+				let a = 0;
+			}
 			let angle = Math.atan2(dy, dx);
 			let blocked = false;
 			for (let d = 0; d <= distance; d++) {
@@ -42,6 +45,11 @@ class Player {
 				}
 				let traceTile = floorPlan.get(xx, yy);
 				traceTile.hasLineOfSight = true;
+				if (traceTile.isTransparent() && d == distance && yy != tile.y) {
+					traceTile = floorPlan.get(tile.x, tile.y);
+					traceTile.hasLineOfSight = true;
+				}
+
 				if (!traceTile.isTransparent()) {
 					break;
 					blocked = true;

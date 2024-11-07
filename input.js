@@ -13,27 +13,28 @@ class InputTask extends Task {
 	run() {
 		if (!this.repeating) {
 			if (keyIsPressed) {
+				console.log("repeating and key is pressed");
 				this.emittedKeyCode = keyCode;
 				this.repeating = true;
 				this.countdown = this.INITIAL_DELAY;
 				return 0;
 			} else {
+				this.emittedKeyCode = null;
 				this.countdown = 1;
 				return -1;
 			}
 		} else {
-			this.emittedChar = null;
+			this.emittedKeyCode = null;
 			if (!keyIsPressed) {
 				this.repeating = false;
 				this.countdown = 1;
-				return 0;
+				return -1;
 			} else {
 				this.emittedKeyCode = keyCode;
 				this.countdown = this.DELAY;
 				return 0;
 			}
 		}
-		console.log("return -1");
 		return -1;
 	}
 
@@ -43,7 +44,6 @@ class InputTask extends Task {
 }
 
 function mouseClicked() {
-	console.log("Mouse clicked");
 	let x = Math.floor(mouseX / GRID_SIZE_X);
 	let y = Math.floor(mouseY / GRID_SIZE_Y);
 	let targetTile = gameState.currentFloor().get(x, y);
@@ -83,7 +83,6 @@ function findPath(map, startX, startY, endX, endY) {
 	  if (current.x == endX && current.y == endY) {
 		let path = [];
 		while (current.cameFrom != null) {
-		  console.log(path.length);
 		  path.push(current);
 		  if (current.x == startX && current.y == startY) {
 			return path;
@@ -101,7 +100,7 @@ function findPath(map, startX, startY, endX, endY) {
 			continue;
 		  }
 		  let neighbor = map.get(current.x + dx, current.y + dy);
-		  if (neighbor == null || !neighbor.isEnterable()) {
+		  if (neighbor == null || neighbor.avoidOnPathfinding()) {
 			continue;
 		  }
 		  if (neighbor.visited) {

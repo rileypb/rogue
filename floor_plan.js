@@ -17,6 +17,10 @@ class Tile {
     // Do nothing
   }
 
+  avoidOnPathfinding() {
+    return false;
+  }
+
   updateFlickerFactor() {
     // Do nothing
   }
@@ -29,7 +33,7 @@ class Tile {
     return false;
   }
 
-  isTransparent(player) {
+  isTransparent() {
     return false;
   }
 
@@ -119,9 +123,7 @@ class FloorPlan {
 
   updateFlicker() {
     for (let tile of this.tiles) {
-      if (tile instanceof Lamp) {
-        tile.updateFlickerFactor();
-      }
+      tile.updateFlickerFactor();
     }
   }
 
@@ -234,7 +236,46 @@ class FloorPlan {
     for (let i = 0; i < 5; i++) {
       let x = Math.floor(Math.random() * this.width);
       let y = Math.floor(Math.random() * this.height);
+      while (!this.get(x, y).isEnterable()) {
+        x = Math.floor(Math.random() * this.width);
+        y = Math.floor(Math.random() * this.height);
+      }
       this.tiles[x + y * this.width] = new Lamp(x, y, color(Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)));
+    }
+
+    // add one irregularly shaped pool of lava of around 8 spaces
+    let x = Math.floor(Math.random() * this.width);
+    let y = Math.floor(Math.random() * this.height);
+    let dx = Math.floor(Math.random() * 6) + 1;
+    let dy = Math.floor(Math.random() * 6) + 1;
+    for (let xx = x; xx < x + dx; xx++) {
+      for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
+        this.tiles[xx + yy * this.width] = new Lava(xx, yy);
+      }
+    }
+
+    // add one irregularly shaped pool of water of around 8 spaces
+    x = Math.floor(Math.random() * this.width);
+    y = Math.floor(Math.random() * this.height);
+    dx = Math.floor(Math.random() * 6) + 1;
+    dy = Math.floor(Math.random() * 6) + 1;
+    for (let xx = x; xx < x + dx; xx++) {
+      for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
+        this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
+      }
+    }
+    // add one ellipse shaped pool of water of around 8 spaces
+    x = Math.floor(Math.random() * this.width);
+    y = Math.floor(Math.random() * this.height);
+    dx = Math.floor(Math.random() * 6) + 1;
+    dy = Math.floor(Math.random() * 6) + 1;
+    for (let xx = x-dx; xx < x + dx; xx++) {
+      for (let yy = y-dy; yy < Math.min(this.height,y + dy); yy++) {
+        if ((xx - x) ** 2 / dx ** 2 + (yy - y) ** 2 / dy ** 2 < 1) {
+
+          this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
+        }
+      }
     }
   }
 
@@ -252,6 +293,10 @@ class Wall extends Tile {
     this.kind = kind;
   }
 
+  avoidOnPathfinding() {
+    return true;
+  }
+
   render() {
     let resultingLight = this.light;
     if (this.kind == this.WOOD) {
@@ -264,7 +309,7 @@ class Wall extends Tile {
       fill(255);
       stroke(255);
     } else if (this.hasBeenSeen && !this.visible) {
-      fill(0);
+      fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);
     }
     let char = '#';
@@ -284,7 +329,7 @@ class Floor extends Tile {
       fill(255);
       stroke(255);
     } else if (this.hasBeenSeen && !this.visible) {
-      fill(0);
+      fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);
     }
     text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
@@ -327,10 +372,21 @@ class Lamp extends Tile {
     this.lightSource = new LightSource(color, 0.1);
   }
 
+  avoidOnPathfinding() {
+    return true;
+  }
+
   render() {
     this.updateFlickerFactor();
     fill(this.getLight());
     stroke(this.getLight());
+    if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
+      fill(255);
+      stroke(255);
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(MEMORY_LIGHT);
+      stroke(MEMORY_LIGHT);
+    }
     text('o', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
   }
 
@@ -444,6 +500,32 @@ class Water extends Tile {
   constructor(x, y, depth) {
     super(x, y);
     this.depth = depth;
+    this.color = color(0, 0, 255);
+    this.lightSource = new LightSource(this.color, 0.1);
+  }
+
+  avoidOnPathfinding() {
+    return true;
+  }
+
+
+  render() {
+    // this.lightSource.updateFlickerFactor();
+    let useColor = lerpColor(this.lightSource.getLight(), this.light, 0.5);
+    fill(useColor);
+    stroke(useColor);
+    if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
+      fill(255);
+      stroke(255);
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(MEMORY_LIGHT);
+      stroke(MEMORY_LIGHT);
+    }
+    rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+  }
+
+  updateFlickerFactor() {
+    this.lightSource.updateFlickerFactor();
   }
 
   isEnterable() {
@@ -487,6 +569,35 @@ class Lava extends Tile {
 
   constructor(x, y) {
     super(x, y);
+    this.color = color(255, 0, 0);
+    this.lightSource = new LightSource(this.color, 0.2);
+  }
+
+  avoidOnPathfinding() {
+    return true;
+  }
+
+
+  render() {
+    // this.updateFlickerFactor();
+    fill(this.getLight());
+    stroke(this.getLight());
+    if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
+      fill(255);
+      stroke(255);
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(MEMORY_LIGHT);
+      stroke(MEMORY_LIGHT);
+    }
+    rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+  }
+
+  updateFlickerFactor() {
+    this.lightSource.updateFlickerFactor();
+  }
+
+  getLight() {
+    return this.lightSource.getLight();
   }
 
   isEnterable() {
@@ -518,11 +629,11 @@ class Lava extends Tile {
   }
 
   onEnter(player) {
-    player.health -= LAVA_DAMAGE;
+    // player.health -= LAVA_DAMAGE;
   }
 
   onStay(player) {
-    player.health -= LAVA_DAMAGE;
+    // player.health -= LAVA_DAMAGE;
   }
 }
 

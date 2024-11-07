@@ -1,15 +1,15 @@
 let taskManager = new TaskManager();
-let counterTask = new TestTask("Counter Task");
+// let counterTask = new TestTask("Counter Task");
 let inputTask = new InputTask();
 let gameState = new GameState();
 let flickerTask;
 let autoMoveTask;
 
-const GRID_SIZE_X = 12;
-const GRID_SIZE_Y = 16;
+const GRID_SIZE_X = 20;
+const GRID_SIZE_Y = 20;
 const FONT_NAME = 'monospace';
-const MAP_WIDTH = 90;
-const MAP_HEIGHT = 55;
+const MAP_WIDTH = 75;
+const MAP_HEIGHT = 40;
 
 const CANVAS_WIDTH = GRID_SIZE_X * MAP_WIDTH;
 const CANVAS_HEIGHT = GRID_SIZE_Y * MAP_HEIGHT;
@@ -35,11 +35,15 @@ let autoMoveInProgress = false;
 
 function setup() {
 	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-	taskManager.addTask(counterTask);
+	// taskManager.addTask(counterTask);
 	taskManager.addTask(inputTask);
 	autoMoveTask = new AutoMoveTask();
 	taskManager.addTask(autoMoveTask);
 	setupGameState(gameState);
+	// set up falloff values
+	for (let i = 0; i <= MAX_LIGHT_DISTANCE; i++) {
+		fallOffValues.push(LIGHT_FALL_OFF ** i);
+	}
 	textFont(FONT_NAME);
 	textSize(GRID_SIZE_Y);
 	playerLightSource = new LightSource(color(255, 255, 128), 0.1);
@@ -56,7 +60,6 @@ function setupGameState(gameState) {
 	gameState.floors = [new FloorPlan(MAP_WIDTH, MAP_HEIGHT, 0)];
 	gameState.floorIndex = 0;
 	gameState.currentFloor().generate();
-	console.log("Game state setup complete");
 	flickerTask = new FlickerTask(gameState.currentFloor());
 	taskManager.addTask(flickerTask);
 }
@@ -67,7 +70,7 @@ function draw() {
 	//render();
 	fill(255);
 	stroke(255);
-	text(counterTask.count, 100, 100);
+	// text(counterTask.count, 100, 100);
 	let moveKey = inputTask.emittedKeyCode;
 	if (moveKey) {
 		switch (moveKey) {
@@ -108,7 +111,7 @@ function draw() {
 }
 
 function keyPressed() {
-	autoMoveInProgress = false;
+	autoMoveTask.autoMoveInProgress = false;
 	inputTask.emittedKeyCode = keyCode;
 	inputTask.repeating = true;
 	taskManager.tasks.push(inputTask);

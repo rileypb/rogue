@@ -5,7 +5,6 @@ class Task {
   }
 
   run() {
-	console.log("Running task: " + this.name);
 	return -1;
   }
 
