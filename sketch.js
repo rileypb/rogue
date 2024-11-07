@@ -27,9 +27,11 @@ const C = 67;
 NORMAL = 0;
 LINE_OF_SIGHT = 1;
 VISIBLE = 2;
+LINE_OF_SIGHT_PLUS = 3;
 
-RENDER_MODE = NORMAL;
 // RENDER_MODE = LINE_OF_SIGHT;
+RENDER_MODE = NORMAL;
+// RENDER_MODE = LINE_OF_SIGHT_PLUS;
 
 let autoMoveInProgress = false;
 
@@ -54,12 +56,16 @@ function setup() {
 }
 
 function setupGameState(gameState) {
-	gameState.player = new Player("The player");
-	gameState.player.x = Math.floor(MAP_WIDTH / 2) - 1;
-	gameState.player.y = Math.floor(MAP_HEIGHT / 2) - 1;
 	gameState.floors = [new FloorPlan(MAP_WIDTH, MAP_HEIGHT, 0)];
 	gameState.floorIndex = 0;
 	gameState.currentFloor().generate();
+	gameState.player = new Player("The player");
+	gameState.player.x = Math.floor(Math.random() * 10);
+	gameState.player.y = Math.floor(Math.random() * MAP_HEIGHT);
+	while (!(gameState.currentFloor().get(gameState.player.x, gameState.player.y) instanceof Floor)) {
+		gameState.player.x = Math.floor(Math.random() * MAP_WIDTH);
+		gameState.player.y = Math.floor(Math.random() * MAP_HEIGHT);
+	}
 	flickerTask = new FlickerTask(gameState.currentFloor());
 	taskManager.addTask(flickerTask);
 }

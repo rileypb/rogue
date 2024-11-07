@@ -85,10 +85,11 @@ class FloorPlan {
     this.width = width;
     this.height = height;
     this.floor = floor;
-    this.tiles = [];
+    this.tiles = new Array(width * height);
+    
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        this.tiles.push(new Tile(x, y));
+        this.set(x, y, new Floor(x, y));
       }
     }
     this.floorIndex = 0;
@@ -222,17 +223,20 @@ class FloorPlan {
       let y = Math.floor(Math.random() * this.height);
       let dx = Math.floor(Math.random() * 6) + 1;
       let dy = Math.floor(Math.random() * 6) + 1;
+      if (x + dx >= this.width) {
+        dx = this.width - x - 1;
+      }
+      if (y + dy >= this.height) {
+        dy = this.height - y - 1;
+      }
+      console.log("wall at " + x + ", " + y, " of size " + dx + ", " + dy);
       for (let xx = x; xx < x + dx; xx++) {
         for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
-          this.tiles[xx + yy * this.width] = new Wall(xx, yy, Wall.WOOD);
-          
+          this.set(xx, yy, new Wall(xx, yy, Wall.WOOD));
         }
       }
-      for (let tile of this.tiles) {
-        tile.x;
-      }
     }
-    // create 5 random lamps
+    //create 5 random lamps
     for (let i = 0; i < 5; i++) {
       let x = Math.floor(Math.random() * this.width);
       let y = Math.floor(Math.random() * this.height);
@@ -250,7 +254,17 @@ class FloorPlan {
     let dy = Math.floor(Math.random() * 6) + 1;
     for (let xx = x; xx < x + dx; xx++) {
       for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
-        this.tiles[xx + yy * this.width] = new Lava(xx, yy);
+        let radius = Math.floor(Math.random() * 4) + 2;
+        for (let xxx = xx-radius; xxx < xx + radius; xxx++) {
+          for (let yyy = yy-radius; yyy < yy + radius; yyy++) {
+            if ((xxx - xx) ** 2 + (yyy - yy) ** 2 < radius ** 2) {
+
+              if (this.tiles[xxx + yyy * this.width] instanceof Floor) {
+                  this.tiles[xxx + yyy * this.width] = new Lava(xxx, yyy);
+              }
+            }
+          }
+        }
       }
     }
 
@@ -261,7 +275,9 @@ class FloorPlan {
     dy = Math.floor(Math.random() * 6) + 1;
     for (let xx = x; xx < x + dx; xx++) {
       for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
-        this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
+        if (this.tiles[xx + yy * this.width] instanceof Floor) {
+          this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
+        }
       }
     }
     // add one ellipse shaped pool of water of around 8 spaces
@@ -272,8 +288,18 @@ class FloorPlan {
     for (let xx = x-dx; xx < x + dx; xx++) {
       for (let yy = y-dy; yy < Math.min(this.height,y + dy); yy++) {
         if ((xx - x) ** 2 / dx ** 2 + (yy - y) ** 2 / dy ** 2 < 1) {
-
-          this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
+          // create a disk of water of radius 1-3.
+          let radius = Math.floor(Math.random() * 4) + 2;
+          for (let xxx = xx-radius; xxx < xx + radius; xxx++) {
+            for (let yyy = yy-radius; yyy < yy + radius; yyy++) {
+              if ((xxx - xx) ** 2 + (yyy - yy) ** 2 < radius ** 2) {
+                if (this.tiles[xxx + yyy * this.width] instanceof Floor) {
+                  this.tiles[xxx + yyy * this.width] = new Water(xxx, yyy, 1);
+                }
+              }
+            }
+          }
+          // this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
         }
       }
     }
@@ -308,6 +334,9 @@ class Wall extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT) {
       fill(255);
       stroke(255);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,200,200));
+      stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);
@@ -328,6 +357,9 @@ class Floor extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
       fill(255);
       stroke(255);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,200,200));
+      stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);
@@ -383,6 +415,9 @@ class Lamp extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
       fill(255);
       stroke(255);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,200,200));
+      stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);
@@ -500,7 +535,7 @@ class Water extends Tile {
   constructor(x, y, depth) {
     super(x, y);
     this.depth = depth;
-    this.color = color(128, 128, 255);
+    this.color = color(0);
     this.lightSource = new LightSource(this.color, 0.1);
   }
 
@@ -517,6 +552,9 @@ class Water extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
       fill(255);
       stroke(255);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,200,200));
+      stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);
@@ -585,6 +623,9 @@ class Lava extends Tile {
     if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
       fill(255);
       stroke(255);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,200,200));
+      stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
       stroke(MEMORY_LIGHT);

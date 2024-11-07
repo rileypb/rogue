@@ -27,18 +27,20 @@ let playerLightSource;
 function updateLight(floorplan, player) {
 	// reset light
 	for (let tile of floorplan.tiles) {
-		tile.light = color(0, 0, 0);
+		if (tile) {
+			tile.light = color(0, 0, 0);
+		}
 	}
 	// cast player's torchlight
 	updateLightFromPosition(floorplan, player.x, player.y, playerLightSource);
 
 	// for each lamp, cast light
 	for (let tile of floorplan.tiles) {
-		if (tile.isLit()) {
+		if (tile && tile.isLit()) {
 			updateLightFromPosition(floorplan, tile.x, tile.y, tile.lightSource);
 		}
 	}
-	
+
 	// mark all non-transparent tiles as having light if they are adjacent to a transparent tile with light. The light should be the average of the adjacent lights.
 	for (let tile of floorplan.tiles) {
 		if (!tile.isTransparent() && tile.hasLineOfSight) {
