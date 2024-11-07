@@ -500,7 +500,7 @@ class Water extends Tile {
   constructor(x, y, depth) {
     super(x, y);
     this.depth = depth;
-    this.color = color(0, 0, 255);
+    this.color = color(128, 128, 255);
     this.lightSource = new LightSource(this.color, 0.1);
   }
 
