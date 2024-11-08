@@ -60,7 +60,7 @@ function setupGameState(gameState) {
 	gameState.floorIndex = 0;
 	gameState.currentFloor().generate();
 	gameState.player = new Player("The player");
-	gameState.player.x = Math.floor(Math.random() * 10);
+	gameState.player.x = Math.floor(Math.random() * MAP_WIDTH);
 	gameState.player.y = Math.floor(Math.random() * MAP_HEIGHT);
 	while (!(gameState.currentFloor().get(gameState.player.x, gameState.player.y) instanceof Floor)) {
 		gameState.player.x = Math.floor(Math.random() * MAP_WIDTH);

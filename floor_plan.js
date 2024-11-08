@@ -195,6 +195,12 @@ class FloorPlan {
     // and near the other lamp
     x = Math.floor(2*this.width / 3) - 6;
     y = Math.floor(2*this.height / 3) - 3;
+    while (x < 0) {
+      x++;
+    }
+    while (y < 0) {
+      y++;
+    }
     this.tiles[x + y * this.width] = new Wall(x, y);
     this.tiles[x + (y - 1) * this.width] = new Wall(x, y - 1);
     this.tiles[x + (y - 2) * this.width] = new Wall(x, y - 2);
@@ -255,6 +261,12 @@ class FloorPlan {
     for (let xx = x; xx < x + dx; xx++) {
       for (let yy = y; yy < Math.min(this.height,y + dy); yy++) {
         let radius = Math.floor(Math.random() * 4) + 2;
+        if (xx - radius < 0) {
+          radius = xx;
+        }
+        if (yy - radius < 0) {
+          radius = yy;
+        }
         for (let xxx = xx-radius; xxx < xx + radius; xxx++) {
           for (let yyy = yy-radius; yyy < yy + radius; yyy++) {
             if ((xxx - xx) ** 2 + (yyy - yy) ** 2 < radius ** 2) {
@@ -285,11 +297,23 @@ class FloorPlan {
     y = Math.floor(Math.random() * this.height);
     dx = Math.floor(Math.random() * 6) + 1;
     dy = Math.floor(Math.random() * 6) + 1;
+    if (x - dx < 0) {
+      dx = x;
+    }
+    if (y - dy < 0) {
+      dy = y;
+    }
     for (let xx = x-dx; xx < x + dx; xx++) {
       for (let yy = y-dy; yy < Math.min(this.height,y + dy); yy++) {
         if ((xx - x) ** 2 / dx ** 2 + (yy - y) ** 2 / dy ** 2 < 1) {
           // create a disk of water of radius 1-3.
           let radius = Math.floor(Math.random() * 4) + 2;
+          if (xx - radius < 0) {
+            radius = xx;
+          }
+          if (yy - radius < 0) {
+            radius = yy;
+          }
           for (let xxx = xx-radius; xxx < xx + radius; xxx++) {
             for (let yyy = yy-radius; yyy < yy + radius; yyy++) {
               if ((xxx - xx) ** 2 + (yyy - yy) ** 2 < radius ** 2) {
