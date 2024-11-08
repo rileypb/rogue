@@ -148,7 +148,7 @@ class AutoMoveTask extends Task {
 					gameState.player.calculateSight(gameState.currentFloor());
 					render();
 					if (this.path.length > 0) {
-						findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, this.path[this.path.length - 1].x, this.path[this.path.length - 1].y);
+						this.path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, this.path[0].x, this.path[0].y);
 					}
 				}
 				else {
