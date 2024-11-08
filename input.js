@@ -100,7 +100,7 @@ function findPath(map, startX, startY, endX, endY) {
 			continue;
 		  }
 		  let neighbor = map.get(current.x + dx, current.y + dy);
-		  if (neighbor == null || neighbor.avoidOnPathfinding()) {
+		  if (neighbor == null || neighbor.avoidOnPathfinding() || !neighbor.hasBeenSeen) {
 			continue;
 		  }
 		  if (neighbor.visited) {
