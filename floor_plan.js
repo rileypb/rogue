@@ -352,6 +352,12 @@ class FloorPlan {
 				if (yy - radius < 0) {
 					radius = yy;
 				}
+				if (xx + radius >= this.width) {
+					radius = this.width - xx - 1;
+				}
+				if (yy + radius >= this.height) {
+					radius = this.height - yy - 1;
+				}
 				for (let xxx = xx - radius; xxx < xx + radius; xxx++) {
 					for (let yyy = yy - radius; yyy < yy + radius; yyy++) {
 						if ((xxx - xx) ** 2 + (yyy - yy) ** 2 < radius ** 2) {
@@ -398,6 +404,12 @@ class FloorPlan {
 					}
 					if (yy - radius < 0) {
 						radius = yy;
+					}
+					if (xx + radius >= this.width) {
+						radius = this.width - xx - 1;
+					}
+					if (yy + radius >= this.height) {
+						radius = this.height - yy - 1;
 					}
 					for (let xxx = xx - radius; xxx < xx + radius; xxx++) {
 						for (let yyy = yy - radius; yyy < yy + radius; yyy++) {
@@ -514,7 +526,7 @@ class Lamp extends Tile {
 	}
 
 	avoidOnPathfinding() {
-		return true;
+		return false;
 	}
 
 	render() {

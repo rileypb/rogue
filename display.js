@@ -38,12 +38,60 @@ function drawFloorPlan() {
 	}
 }
 
-drawCursor = function() {
+function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
 	let x = Math.floor(mouseX / GRID_SIZE_X);
 	let y = Math.floor(mouseY / GRID_SIZE_Y);
 	rect(x * GRID_SIZE_X, y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+	let path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
+	if (path) {
+		noStroke();
+		for (let i = path.length - 1; i > 0; i--) {
+			let tile = path[i];
+			fill(255, 255, 255, 128);
+			// rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			let nextTile = path[i - 1];
+			let dx = nextTile.x - tile.x;
+			let dy = nextTile.y - tile.y;
+			if (dx == 1 && dy == 0) {
+				// fill(0);
+				text('→', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			} else if (dx == -1 && dy == 0) {
+				// fill(0);
+				text('←', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			} else if (dx == 0 && dy == 1) {
+				// fill(0);
+				text('↓', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			} else if (dx == 0 && dy == -1) {
+				// fill(0);
+				text('↑', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			} else if (dx == 1 && dy == 1) {
+				// fill(0);
+				text('↘', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			} else if (dx == -1 && dy == 1) {
+				// fill(0);
+				text('↙', (tile.x + 0.25) * GRID_SIZE_X, (tile.y +0.75) * GRID_SIZE_Y);
+			} else if (dx == 1 && dy == -1) {
+				// fill(0);
+				text('↗', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			} else if (dx == -1 && dy == -1) {
+				// fill(0);
+				text('↖', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+			}
+		}
+		if (path.length > 0) {
+			fill(255, 255, 255, 128);
+			rect(path[0].x * GRID_SIZE_X, path[0].y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(0);
+			text('⌖', (path[0].x + 0) * GRID_SIZE_X, (path[0].y + 0.75) * GRID_SIZE_Y);
+		}
+	} else {
+		fill(255, 255, 255, 128);
+		rect((x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
+		fill(0);
+		text('X', (x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
+	}
 }
 
 function drawPlayer() {
