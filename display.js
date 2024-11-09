@@ -25,9 +25,15 @@ function drawFloorPlan() {
 			tile.render();
 		} 
 		if (!tile.visible){
-			fill(255, 255, 255, 32);
+			fill(128, 128, 255, 16);
 			noStroke();
 			rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(255, 255, 255, 8);
+			noStroke();
+			rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
+			rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
+			rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
+			rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
 		}
 	}
 }

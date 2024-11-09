@@ -666,9 +666,26 @@ class Water extends Tile {
       stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
-      stroke(MEMORY_LIGHT);
+      noStroke();
     }
-    rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+    if (this.visible) {
+      rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+    }
+
+    let tildeColor = lerpColor(this.lightSource.getLight(), color(0, 0, 64), 0.75);
+    fill(tildeColor);
+    stroke(tildeColor);
+    if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
+      fill(128);
+      stroke(128);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,128,128));
+      stroke(color(255,128,128));
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(0, 0, 128);
+      noStroke();
+    }
+    text('~', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
   }
 
   updateFlickerFactor() {
@@ -737,9 +754,27 @@ class Lava extends Tile {
       stroke(color(255,200,200));
     } else if (this.hasBeenSeen && !this.visible) {
       fill(MEMORY_LIGHT);
-      stroke(MEMORY_LIGHT);
+      noStroke();
     }
-    rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+    if (this.visible) {
+      rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+    }
+
+    let caretColor = lerpColor(this.lightSource.getLight(), color(64, 0, 0), 0.75);
+    fill(caretColor);
+    stroke(caretColor);
+    if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
+      fill(128);
+      stroke(128);
+    } else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
+      fill(color(255,128,128));
+      stroke(color(255,128,128));
+    } else if (this.hasBeenSeen && !this.visible) {
+      fill(255, 0, 0);
+      noStroke();
+    }
+    text('^', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+
   }
 
   updateFlickerFactor() {
