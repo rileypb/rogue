@@ -1,7 +1,7 @@
 const LIGHT_FALL_OFF = 0.88;
 const LIGHT_THRESHOLD = 0.1;
 const MAX_LIGHT_DISTANCE = 20;
-const MEMORY_LIGHT = 30;
+const MEMORY_LIGHT = 40;
 
 let fallOffValues = [];
 

@@ -3,6 +3,7 @@ function render() {
 	background(0);
 	drawFloorPlan();
 	drawPlayer();
+	drawCursor();
 	//   drawEnemies();
 }
 
@@ -22,9 +23,21 @@ function drawFloorPlan() {
 			// stroke(color(255,200,200));
 			// rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			tile.render();
+		} 
+		if (!tile.visible){
+			fill(255, 255, 255, 32);
+			noStroke();
+			rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 		}
-
 	}
+}
+
+drawCursor = function() {
+	fill(255, 255, 255, 64);
+	stroke(255, 255, 255, 64);
+	let x = Math.floor(mouseX / GRID_SIZE_X);
+	let y = Math.floor(mouseY / GRID_SIZE_Y);
+	rect(x * GRID_SIZE_X, y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 }
 
 function drawPlayer() {

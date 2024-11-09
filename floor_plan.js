@@ -155,6 +155,91 @@ class FloorPlan {
         this.tiles[x + y * this.width] = new Wall(x, y);
       }
     }
+
+    // carve out some rooms in the form of ellipses.
+    let roomCount = Math.floor(Math.random() * 15) + 40;
+    for (let i = 0; i < roomCount; i++) {
+      let x = Math.floor(Math.random() * this.width);
+      let y = Math.floor(Math.random() * this.height);
+      let dx = Math.floor(Math.random() * 6) + 1;
+      let dy = Math.floor(Math.random() * 6) + 1;
+      let xSpace = Math.min(x, this.width - x);
+      let ySpace = Math.min(y, this.height - y);
+      if (dx > xSpace) {
+        dx = xSpace - 1;
+      }
+      if (dy > ySpace) {
+        dy = ySpace - 1;
+      }
+      let xPow = Math.floor(Math.random() * 3) + 2;
+      let yPow = Math.floor(Math.random() * 3) + 2;
+      for (let xx = x-dx; xx < x + dx; xx++) {
+        for (let yy = y-dy; yy < y + dy; yy++) {
+          if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
+            this.tiles[xx + yy * this.width] = new Floor(xx, yy);
+          }
+        }
+      }
+    }
+
+
+
+	// connect it all with corridors
+	// find the connected components
+	let components = [];
+  let used = [];
+	for (let y = 0; y < this.height; y++) {
+		for (let x = 0; x < this.width; x++) {
+			if (this.get(x, y) === null) {
+				continue;
+			}
+			if (this.get(x, y).isEnterable() && !used.includes(this.get(x, y))) {
+				let component = [];
+				let stack = [{ x: x, y: y }];
+				while (stack.length > 0) {
+					let current = stack.pop();
+					if (!this.get(current.x, current.y)) {
+						continue;
+					}
+					if (used.includes(this.get(current.x, current.y))) {
+						continue;
+					}
+					if (this.get(current.x, current.y).isEnterable()) {
+						component.push(current);
+						// map.set(current.x, current.y, null);
+						used.push(this.get(current.x, current.y));
+						stack.push({ x: current.x + 1, y: current.y });
+						stack.push({ x: current.x - 1, y: current.y });
+						stack.push({ x: current.x, y: current.y + 1 });
+						stack.push({ x: current.x, y: current.y - 1 });
+					}
+				}
+				components.push(component);
+			}
+
+		}
+	}
+	// connect the components
+	for (let i = 0; i < components.length - 1; i++) {
+		let a = components[i][Math.floor(Math.random() * components[i].length)];
+		let b = components[i+1][Math.floor(Math.random() * components[i+1].length)];
+		let x = a.x;
+		let y = a.y;
+		while (x != b.x || y != b.y) {
+			if (!this.get(x, y).isEnterable()) {
+				this.set(x, y, new Floor(x, y));
+			}
+			if (x < b.x) {
+				x++;
+			} else if (x > b.x) {
+				x--;
+			} else if (y < b.y) {
+				y++;
+			} else if (y > b.y) {
+				y--;
+			}
+		}
+	}
   }
 
   generateOneRoom() {
