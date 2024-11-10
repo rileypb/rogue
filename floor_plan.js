@@ -476,6 +476,15 @@ class Wall extends Tile {
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
+		} else {
+			colorMode(HSB);
+			let c = color(this.light._getHue(), 0.5 * this.light._getSaturation(), this.light._getBrightness() * 0.5);
+			fill(c);
+			noStroke();
+			colorMode(RGB);
+			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(this.light);
+			stroke(this.light);
 		}
 		let char = '#';
 		text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
@@ -499,6 +508,15 @@ class Floor extends Tile {
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
+		} else {
+			colorMode(HSB);
+			let c = color(this.light._getHue(), 0.5 * this.light._getSaturation(), this.light._getBrightness() * 0.5);
+			fill(c);
+			noStroke();
+			colorMode(RGB);
+			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(this.light);
+			stroke(this.light);
 		}
 		text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 	}
@@ -557,6 +575,15 @@ class Lamp extends Tile {
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
+		} else {
+			colorMode(HSB);
+			let c = color(this.light._getHue(), 0.5 * this.light._getSaturation(), this.light._getBrightness() * 0.5);
+			fill(c);
+			noStroke();
+			colorMode(RGB);
+			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(this.light);
+			stroke(this.light);
 		}
 		text('o', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 	}
