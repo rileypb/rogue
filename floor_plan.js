@@ -171,6 +171,8 @@ class FloorPlan {
 			if (dy > ySpace) {
 				dy = ySpace - 1;
 			}
+			let isLava = Math.random() < 0.01;
+			let isWater = Math.random() < 0.01;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
 			for (let xx = x - dx; xx < x + dx; xx++) {
@@ -179,7 +181,17 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						this.tiles[xx + yy * this.width] = new Floor(xx, yy);
+						if (Math.random() < 0.003) {
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, color(Math.random() * 255, Math.random() * 255, Math.random() * 255));
+						} else {
+							if (isLava) {
+								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
+							} else if (isWater) {
+								this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
+							} else {
+								this.tiles[xx + yy * this.width] = new Floor(xx, yy);
+							}
+						}
 					}
 				}
 			}

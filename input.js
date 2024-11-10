@@ -43,14 +43,16 @@ class InputTask extends Task {
 	}
 }
 
+let path = null;
+
 function mouseClicked() {
 	let x = Math.floor(mouseX / GRID_SIZE_X);
 	let y = Math.floor(mouseY / GRID_SIZE_Y);
 	let targetTile = gameState.currentFloor().get(x, y);
-	if (!targetTile || !targetTile.isEnterable() || !targetTile.hasBeenSeen) {
+	if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
 		return;
 	}
-	let path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
+	path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 	if (!path) {
 		return;
 	}
@@ -99,8 +101,11 @@ function findPath(map, startX, startY, endX, endY) {
 		  if (dx == 0 && dy == 0) {
 			continue;
 		  }
+		  if (current.x + dx < 0 || current.x + dx >= map.width || current.y + dy < 0 || current.y + dy >= map.height) {
+			continue;
+		  }
 		  let neighbor = map.get(current.x + dx, current.y + dy);
-		  if (neighbor == null || neighbor.avoidOnPathfinding() || !neighbor.hasBeenSeen) {
+		  if (neighbor == null || (neighbor.avoidOnPathfinding() && neighbor.hasBeenSeen)) {
 			continue;
 		  }
 		  if (neighbor.visited) {
@@ -138,6 +143,10 @@ class AutoMoveTask extends Task {
 	run() {
 		if (this.autoMoveInProgress) {
 			this.countdown = 1;
+			if (!this.path) {
+				this.autoMoveInProgress = false;
+				return 0;
+			}
 			if (this.path.length > 0) {
 				let move = this.path.pop();
 				let dx = move.x - gameState.player.x;
