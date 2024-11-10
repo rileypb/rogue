@@ -54,6 +54,7 @@ function mouseClicked() {
 	}
 	path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 	if (!path) {
+		targetTile.unreachable = true;
 		return;
 	}
 	if (path.length > 0) {
@@ -157,12 +158,24 @@ class AutoMoveTask extends Task {
 					gameState.player.calculateSight(gameState.currentFloor());
 					render();
 					if (this.path.length > 0) {
-						this.path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, this.path[0].x, this.path[0].y);
+						let nextX = this.path[0].x;
+						let nextY = this.path[0].y;
+						this.path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, nextX, nextY);
+						if (!this.path) {
+							this.autoMoveInProgress = false;
+							gameState.currentFloor().get(nextX, nextY).unreachable = true;
+						} else if (this.path.length == 0) {
+							this.autoMoveInProgress = false;
+						} else {
+							this.countdown = 1;
+						}
 					}
 				}
 				else {
 					this.autoMoveInProgress = false;
 				}
+			} else {
+				this.autoMoveInProgress = false;
 			}
 		}
 		this.countdown = 1;

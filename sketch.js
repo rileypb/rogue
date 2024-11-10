@@ -23,6 +23,7 @@ const D = 68;
 const Z = 90;
 const X = 88;
 const C = 67;
+const META = 93;
 
 NORMAL = 0;
 LINE_OF_SIGHT = 1;
@@ -34,6 +35,7 @@ RENDER_MODE = NORMAL;
 // RENDER_MODE = LINE_OF_SIGHT_PLUS;
 
 let autoMoveInProgress = false;
+let exploreInProgress = false;
 
 function setup() {
 	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -49,7 +51,7 @@ function setup() {
 	}
 	textFont(FONT_NAME);
 	textSize(GRID_SIZE_Y);
-	playerLightSource = new LightSource(color(255, 255, 128), 0.1);
+	playerLightSource = new LightSource(color(255, 255, 200), 0.1);
 	gameState.player.calculateLineOfSight(gameState.currentFloor());
 	updateLight(gameState.currentFloor(), gameState.player);
 	gameState.player.calculateSight(gameState.currentFloor());
@@ -103,16 +105,39 @@ function draw() {
 				gameState.player.move(-1, 1, gameState.currentFloor());
 				break;
 			case X:
-				gameState.player.move(0, 1, gameState.currentFloor());
+				if (keyIsDown(META)) {
+					exploreInProgress = true;
+				} else {
+					gameState.player.move(0, 1, gameState.currentFloor());
+				}
+				break;
+			case 32:
+				exploreInProgress = true;
 				break;
 			case C:
 				gameState.player.move(1, 1, gameState.currentFloor());
 				break;
+			
 		}
 		gameState.player.calculateLineOfSight(gameState.currentFloor());
 		updateLight(gameState.currentFloor(), gameState.player);
 		gameState.player.calculateSight(gameState.currentFloor());
 		render();
+	}
+	if (exploreInProgress && !autoMoveTask.autoMoveInProgress) {
+		// find the nearest unexplored tile
+		let nearestTile = gameState.currentFloor().getNearestUnexplored(gameState.player.x, gameState.player.y);
+		if (nearestTile) {
+			let path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, nearestTile.x, nearestTile.y);
+			if (path) {
+				autoMoveTask.path = path;
+				autoMoveTask.autoMoveInProgress = true;
+			} else {
+				nearestTile.unreachable = true;
+			}
+		} else {
+			exploreInProgress = false;
+		}
 	}
 
 }

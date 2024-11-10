@@ -11,6 +11,8 @@ class Tile {
 		this.hasLineOfSight = false;
 
 		this.isSpecial = false;
+
+		this.unreachable = false;
 	}
 
 	render() {
@@ -128,6 +130,29 @@ class FloorPlan {
 		}
 	}
 
+	getNearestUnexplored(x, y) {
+		let openSet = [this.get(x, y)];
+		let closedSet = [];
+		while (openSet.length > 0) {
+			let current = openSet.shift();
+			if (!current.hasBeenSeen && !current.unreachable) {
+				return current;
+			}
+			closedSet.push(current);
+			let neighbors = this.getNeighbors(current.x, current.y);
+			for (let neighbor of neighbors) {
+				let tile = this.get(neighbor.x, neighbor.y);
+				if (tile == null || closedSet.includes(tile)) {
+					continue;
+				}
+				if (!openSet.includes(tile)) {
+					openSet.push(tile);
+				}
+			}
+		}
+		return null;
+	}
+
 	generate() {
 		switch (this.type) {
 			case this.NATURAL:
@@ -152,7 +177,7 @@ class FloorPlan {
 		// fill with wall tiles
 		for (let x = 0; x < this.width; x++) {
 			for (let y = 0; y < this.height; y++) {
-				this.tiles[x + y * this.width] = new Wall(x, y);
+				this.tiles[x + y * this.width] = new Wall(x, y, Wall.WOOD);
 			}
 		}
 
@@ -182,7 +207,10 @@ class FloorPlan {
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
 						if (Math.random() < 0.003) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, color(Math.random() * 255, Math.random() * 255, Math.random() * 255));
+							colorMode(HSB);
+							let c = color(Math.round(Math.random() * 360), Math.round(Math.random() * 100), 25);
+							colorMode(RGB);
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, c);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
@@ -461,24 +489,51 @@ class Wall extends Tile {
 
 	render() {
 		let resultingLight = this.light;
-		if (this.kind == this.WOOD) {
-			resultingLight = color(139, 69, 19);
+		switch (this.kind) {
+			case this.STONE:
+				resultingLight = lerpColor(this.light, color(128,128,128,128), 0.75);
+				break;
+			case this.WOOD:
+				resultingLight = color(128, 64, 0, 128);
+				break;
+			case this.METAL:
+				resultingLight = lerpColor(this.light, color(128, 128, 128, 128), 0.75);
+				break;
 		}
+		let char = '#';
 
 		fill(this.light);
 		stroke(this.light);
 		if (RENDER_MODE == LINE_OF_SIGHT) {
 			fill(255);
 			stroke(255);
+			text(char, (this.x + 0.1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
+			text(char, (this.x + 0.1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
+			text(char, (this.x + 0.1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		} else {
+			fill(resultingLight);
+			noStroke();
+			let c = color(128, 64,0,128);
+			colorMode(HSB);
+			c = color(c._getHue(), c._getSaturation(), this.light._getBrightness(), 128);
+			fill(c);
+			colorMode(RGB);
+
+			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect((this.x+0.1) * GRID_SIZE_X, (this.y+0.1) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect((this.x-0.1) * GRID_SIZE_X, (this.y-0.1) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect((this.x+0.1) * GRID_SIZE_X, (this.y-0.1) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect((this.x-0.1) * GRID_SIZE_X, (this.y+0.1) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+
+			fill(resultingLight);
+			stroke(resultingLight);
 		}
-		let char = '#';
-		text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 	}
 }
 
@@ -493,14 +548,21 @@ class Floor extends Tile {
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
 			fill(255);
 			stroke(255);
+			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
+			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
+			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		} else {
+			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(128);
+			stroke(128);
+			
 		}
-		text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 	}
 
 	isEnterable() {
@@ -546,8 +608,8 @@ class Lamp extends Tile {
 
 	render() {
 		this.updateFlickerFactor();
-		fill(this.getLight());
-		stroke(this.getLight());
+		fill(this.light);
+		stroke(this.light);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
 			fill(255);
 			stroke(255);
@@ -557,6 +619,10 @@ class Lamp extends Tile {
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
+		} else {
+			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			fill(128);
+			stroke(128);
 		}
 		text('o', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 	}
