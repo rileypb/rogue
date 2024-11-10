@@ -43,7 +43,7 @@ function drawCursor() {
 	stroke(255, 255, 255, 64);
 	let x = Math.floor(mouseX / GRID_SIZE_X);
 	let y = Math.floor(mouseY / GRID_SIZE_Y);
-	rect(x * GRID_SIZE_X, y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+	// ellipse(x * GRID_SIZE_X, y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 	let path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 	if (path) {
 		noStroke();
@@ -82,13 +82,13 @@ function drawCursor() {
 		}
 		if (path.length > 0) {
 			fill(255, 255, 255, 128);
-			rect(path[0].x * GRID_SIZE_X, path[0].y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			ellipse((path[0].x+0.5) * GRID_SIZE_X, (path[0].y+0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(0);
 			text('⌖', (path[0].x + 0) * GRID_SIZE_X, (path[0].y + 0.75) * GRID_SIZE_Y);
 		}
 	} else {
 		fill(255, 255, 255, 128);
-		rect((x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
+		ellipse((x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
 		fill(0);
 		text('X', (x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
 	}
