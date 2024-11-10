@@ -175,6 +175,9 @@ class FloorPlan {
 			let yPow = Math.floor(Math.random() * 3) + 2;
 			for (let xx = x - dx; xx < x + dx; xx++) {
 				for (let yy = y - dy; yy < y + dy; yy++) {
+					if (xx < 1 || xx >= this.width - 1 || yy < 1 || yy >= this.height - 1) {
+						continue;
+					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
 						this.tiles[xx + yy * this.width] = new Floor(xx, yy);
 					}
