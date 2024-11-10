@@ -93,7 +93,7 @@ class FloorPlan {
 			}
 		}
 		this.floorIndex = 0;
-		this.type = this.RANDOM_WALLS;
+		this.type = this.NATURAL;
 	}
 
 	get(x, y) {

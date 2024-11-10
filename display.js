@@ -87,10 +87,12 @@ function drawCursor() {
 			text('⌖', (path[0].x + 0) * GRID_SIZE_X, (path[0].y + 0.75) * GRID_SIZE_Y);
 		}
 	} else {
-		fill(255, 255, 255, 128);
-		ellipse((x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
+		fill(255, 0, 0, 128);
+		stroke(0);
+		ellipse((x + 0.5) * GRID_SIZE_X, (y + 0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 		fill(0);
-		text('X', (x + 0.25) * GRID_SIZE_X, (y + 0.75) * GRID_SIZE_Y);
+		noStroke();
+		text('X', (x + 0.2) * GRID_SIZE_X, (y + 0.85) * GRID_SIZE_Y);
 	}
 }
 

@@ -37,6 +37,7 @@ let autoMoveInProgress = false;
 
 function setup() {
 	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	cursor(CROSS);
 	// taskManager.addTask(counterTask);
 	taskManager.addTask(inputTask);
 	autoMoveTask = new AutoMoveTask();
