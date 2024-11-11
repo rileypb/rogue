@@ -14,7 +14,7 @@ class LightSource {
 
 	updateFlickerFactor() {
 		this.flickerFactor = (Math.random() * this.flicker + (1 - this.flicker)) ** 2;
-	}	
+	}
 
 	getLight() {
 		return color(this.color._getRed() * this.flickerFactor, this.color._getGreen() * this.flickerFactor, this.color._getBlue() * this.flickerFactor);
@@ -53,7 +53,7 @@ function updateLight(floorplan, player) {
 				let neighborTile = floorplan.get(neighbor.x, neighbor.y);
 				if (!neighborTile.isTransparent() || !neighborTile.hasLineOfSight) {
 					continue;
-				}					
+				}
 				let d1 = (neighborTile.x - gameState.player.x) ** 2 + (neighborTile.y - gameState.player.y) ** 2;
 				let d2 = (tile.x - gameState.player.x) ** 2 + (tile.y - gameState.player.y) ** 2;
 				if (d1 < d2) {
@@ -71,42 +71,66 @@ function updateLight(floorplan, player) {
 }
 
 function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
-	for (let x = lightX - MAX_LIGHT_DISTANCE; x <= lightX + MAX_LIGHT_DISTANCE; x++) {
-		for (let y = lightY - MAX_LIGHT_DISTANCE; y <= lightY + MAX_LIGHT_DISTANCE; y++) {
-			let distance = Math.sqrt((x - lightX) ** 2 + (y - lightY) ** 2);
-			if (distance > MAX_LIGHT_DISTANCE) {
-				continue;
-			}
-			let dx = x - lightX;
-			let dy = y - lightY;
-			let angle = Math.atan2(dy, dx);
-			// trace a ray from the target tile to the lamp
-			let light = lightSource.getLight();
-			blocked = false;
-			for (let d = 0; d <= distance; d++) {
-				let xx = Math.floor(lightX + Math.cos(angle) * d);
-				let yy = Math.floor(lightY + Math.sin(angle) * d);
-				if (dx < 0) {
-					xx = Math.ceil(lightX + Math.cos(angle) * d);
+	if (BRESENHAM_ALGORITHM) {
+		for (let x = lightX - MAX_LIGHT_DISTANCE; x <= lightX + MAX_LIGHT_DISTANCE; x++) {
+			for (let y = lightY - MAX_LIGHT_DISTANCE; y <= lightY + MAX_LIGHT_DISTANCE; y++) {
+				let distance = Math.sqrt((x - lightX) ** 2 + (y - lightY) ** 2);
+				if (distance > MAX_LIGHT_DISTANCE) {
+					continue;
 				}
-				if (dy < 0) {
-					yy = Math.ceil(lightY + Math.sin(angle) * d);
-				}
-				let traceTile = floorplan.get(xx, yy);
-				if (traceTile != null && traceTile != undefined && !traceTile.isTransparent()) {
-					blocked = true;
-					break;
-				}
-			}
-			if (!blocked) {
-				let floorTile = floorplan.get(x, y);
-				if (floorTile != null) {
-					let existingLight = floorTile.light;
-					floorTile.light = color(existingLight._getRed() + light._getRed() * fallOffValues[Math.round(distance)], existingLight._getGreen() + light._getGreen() * fallOffValues[Math.round(distance)], existingLight._getBlue() + light._getBlue() * fallOffValues[Math.round(distance)]);
+
+				let ray = castRay(lightX, lightY, x, y, floorplan, true, true);
+				for (let rayTile of ray) {
+					let floorTile = floorplan.get(rayTile.x, rayTile.y);
+					if (floorTile != null) {
+						let existingLight = floorTile.light;
+						let light = lightSource.getLight();
+						let newLight = color(light._getRed() * fallOffValues[Math.round(distance)], light._getGreen() * fallOffValues[Math.round(distance)], light._getBlue() * fallOffValues[Math.round(distance)]);
+						floorTile.light = lerpColor(existingLight, newLight, 0.5);
+						// floorTile.light = color(existingLight._getRed() + light._getRed() * fallOffValues[Math.round(distance)], existingLight._getGreen() + light._getGreen() * fallOffValues[Math.round(distance)], existingLight._getBlue() + light._getBlue() * fallOffValues[Math.round(distance)]);
+					}
 				}
 			}
 		}
 
+
+	} else {
+		for (let x = lightX - MAX_LIGHT_DISTANCE; x <= lightX + MAX_LIGHT_DISTANCE; x++) {
+			for (let y = lightY - MAX_LIGHT_DISTANCE; y <= lightY + MAX_LIGHT_DISTANCE; y++) {
+				let distance = Math.sqrt((x - lightX) ** 2 + (y - lightY) ** 2);
+				if (distance > MAX_LIGHT_DISTANCE) {
+					continue;
+				}
+				let dx = x - lightX;
+				let dy = y - lightY;
+				let angle = Math.atan2(dy, dx);
+				// trace a ray from the target tile to the lamp
+				let light = lightSource.getLight();
+				blocked = false;
+				for (let d = 0; d <= distance; d++) {
+					let xx = Math.floor(lightX + Math.cos(angle) * d);
+					let yy = Math.floor(lightY + Math.sin(angle) * d);
+					if (dx < 0) {
+						xx = Math.ceil(lightX + Math.cos(angle) * d);
+					}
+					if (dy < 0) {
+						yy = Math.ceil(lightY + Math.sin(angle) * d);
+					}
+					let traceTile = floorplan.get(xx, yy);
+					if (traceTile != null && traceTile != undefined && !traceTile.isTransparent()) {
+						blocked = true;
+						break;
+					}
+				}
+				if (!blocked) {
+					let floorTile = floorplan.get(x, y);
+					if (floorTile != null) {
+						let existingLight = floorTile.light;
+						floorTile.light = color(existingLight._getRed() + light._getRed() * fallOffValues[Math.round(distance)], existingLight._getGreen() + light._getGreen() * fallOffValues[Math.round(distance)], existingLight._getBlue() + light._getBlue() * fallOffValues[Math.round(distance)]);
+					}
+				}
+			}
+		}
 
 	}
 }

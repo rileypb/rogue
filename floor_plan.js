@@ -93,7 +93,7 @@ class FloorPlan {
 			}
 		}
 		this.floorIndex = 0;
-		this.type = this.NATURAL;
+		this.type = this.ONE_ROOM;
 	}
 
 	get(x, y) {
