@@ -197,7 +197,7 @@ class FloorPlan {
 			if (dy > ySpace) {
 				dy = ySpace - 1;
 			}
-			let isLava = Math.random() < 0.01;
+			let isLava = Math.random() < 0.1;
 			let isWater = Math.random() < 0.01;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
@@ -207,7 +207,7 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.000) {
+						if (Math.random() < 0.001) {
 							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, color(Math.random() * 255, Math.random() * 255, Math.random() * 255));
 						} else {
 							if (isLava) {
@@ -274,7 +274,7 @@ class FloorPlan {
 			}
 
 			while (x != b.x || y != b.y) {
-				if (!this.get(x, y).isEnterable()) {
+				if (this.get(x,y) && !this.get(x, y).isEnterable()) {
 					this.set(x, y, new Floor(x, y));
 				}
 				// // allow meandering corridors
@@ -293,13 +293,13 @@ class FloorPlan {
 				// } else 
 				if (Math.random() < 0.1) {
 					let selector = Math.random();
-					if (selector < 0.25) {
+					if (selector < 0.25 && this.get(x + 1, y)) {
 						x++;
-					} else if (selector < 0.5) {
+					} else if (selector < 0.5 && this.get(x - 1, y)) {
 						x--;
-					} else if (selector < 0.75) {
+					} else if (selector < 0.75 && this.get(x, y + 1)) {
 						y++;
-					} else {
+					} else if (this.get(x, y - 1)) {
 						y--;
 					}
 				} else if (Math.random() < 0.5) {
@@ -338,6 +338,7 @@ class FloorPlan {
 			}
 			this.monsters.push(new Goblin(x, y));
 		}
+
 	}
 
 	generateOneRoom() {
@@ -949,6 +950,10 @@ class Lava extends Tile {
 		}
 		text('~', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 
+	}
+
+	isLit() {
+		return true;
 	}
 
 	updateFlickerFactor() {
