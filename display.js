@@ -2,9 +2,9 @@
 function render() {
 	background(0);
 	drawFloorPlan();
+	drawEnemies();
 	drawPlayer();
 	drawCursor();
-	//   drawEnemies();
 }
 
 function drawFloorPlan() {
@@ -100,4 +100,14 @@ function drawPlayer() {
 	fill(255);
 	stroke(255);
 	text('@', gameState.player.x * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y);
+}
+
+function drawEnemies() {
+	for (let monster of gameState.currentFloor().monsters) {
+		tile = gameState.currentFloor().get(monster.x, monster.y);
+		if (tile.visible) {
+			console.log(tile);
+			monster.draw();
+		}
+	}
 }

@@ -11,6 +11,23 @@ class Tile {
 		this.hasLineOfSight = false;
 
 		this.isSpecial = false;
+
+		this.bevelNE = false;
+		this.bevelSE = false;
+		this.bevelSW = false;
+		this.bevelNW = false;
+
+	}
+
+	computeBevel() {
+		if (this.isTransparent()) {
+			return;
+		}
+		// NE corner is beveled if the tiles to the N and E are transparent.
+		this.bevelNE = this.isTransparent(this.x, this.y - 1) && this.isTransparent(this.x + 1, this.y);
+		this.bevelSE = this.isTransparent(this.x, this.y + 1) && this.isTransparent(this.x + 1, this.y);
+		this.bevelSW = this.isTransparent(this.x, this.y + 1) && this.isTransparent(this.x - 1, this.y);
+		this.bevelNW = this.isTransparent(this.x, this.y - 1) && this.isTransparent(this.x - 1, this.y);
 	}
 
 	render() {
@@ -94,6 +111,14 @@ class FloorPlan {
 		}
 		this.floorIndex = 0;
 		this.type = this.NATURAL;
+
+		this.monsters = [];
+	}
+
+	computeBevel() {
+		for (let tile of this.tiles) {
+			tile.computeBevel();
+		}
 	}
 
 	get(x, y) {
@@ -146,6 +171,7 @@ class FloorPlan {
 				this.generateRandomWalls();
 				break;
 		}
+		this.computeBevel();
 	}
 
 	generateNatural() {
@@ -181,7 +207,7 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.003) {
+						if (Math.random() < 0.000) {
 							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, color(Math.random() * 255, Math.random() * 255, Math.random() * 255));
 						} else {
 							if (isLava) {
@@ -240,20 +266,77 @@ class FloorPlan {
 			let b = components[i + 1][Math.floor(Math.random() * components[i + 1].length)];
 			let x = a.x;
 			let y = a.y;
+			if (a.x == b.x || a.y == b.y) {
+				a = components[i][Math.floor(Math.random() * components[i].length)];
+				b = components[i + 1][Math.floor(Math.random() * components[i + 1].length)];
+				x = a.x;
+				y = a.y;
+			}
+
 			while (x != b.x || y != b.y) {
 				if (!this.get(x, y).isEnterable()) {
 					this.set(x, y, new Floor(x, y));
 				}
-				if (x < b.x) {
-					x++;
-				} else if (x > b.x) {
-					x--;
-				} else if (y < b.y) {
-					y++;
-				} else if (y > b.y) {
-					y--;
+				// // allow meandering corridors
+				// if (y == b.y && Math.random() < 0.5 && Math.abs(x - b.x) > 4) {
+				// 	if (Math.random() < 0.5) {
+				// 		y--;
+				// 	} else {
+				// 		y++;
+				// 	}
+				// } else if (x == b.x && Math.random() < 0.5 && Math.abs(y - b.y) > 4) {
+				// 	if (Math.random() < 0.5) {
+				// 		x--;
+				// 	} else {
+				// 		x++;
+				// 	}
+				// } else 
+				if (Math.random() < 0.1) {
+					let selector = Math.random();
+					if (selector < 0.25) {
+						x++;
+					} else if (selector < 0.5) {
+						x--;
+					} else if (selector < 0.75) {
+						y++;
+					} else {
+						y--;
+					}
+				} else if (Math.random() < 0.5) {
+					if (x < b.x) {
+						x++;
+					} else if (x > b.x) {
+						x--;
+					} else if (y < b.y) {
+						y++;
+					} else if (y > b.y) {
+						y--;
+					}
+				}
+				else {
+					if (y < b.y) {
+						y++;
+					} else if (y > b.y) {
+						y--;
+					} else if (x < b.x) {
+						x++;
+					} else if (x > b.x) {
+						x--;
+					}
 				}
 			}
+		}
+
+		// add some monsters
+		let monsterCount = Math.floor(Math.random() * 10) + 10;
+		for (let i = 0; i < monsterCount; i++) {
+			let x = Math.floor(Math.random() * this.width);
+			let y = Math.floor(Math.random() * this.height);
+			while (!this.get(x, y).isEnterable()) {
+				x = Math.floor(Math.random() * this.width);
+				y = Math.floor(Math.random() * this.height);
+			}
+			this.monsters.push(new Goblin(x, y));
 		}
 	}
 
@@ -491,6 +574,30 @@ class Wall extends Tile {
 	}
 }
 
+function canSeePlayer(x, y) {
+	let dx = gameState.player.x - x;
+	let dy = gameState.player.y - y;
+	let distance = Math.sqrt(dx ** 2 + dy ** 2);
+	let angle = Math.atan2(dy, dx);
+	for (let i = 0; i < distance; i++) {
+		let xx = Math.floor(x + i * Math.cos(angle));
+		let yy = Math.floor(y + i * Math.sin(angle));
+		if (dx < 0) {
+			xx = Math.ceil(x + i * Math.cos(angle));
+		}
+		if (dy < 0) {
+			yy = Math.ceil(y + i * Math.sin(angle));
+		}
+		if (xx < 0 || xx >= gameState.currentFloor().width || yy < 0 || yy >= gameState.currentFloor().height) {
+			return false;
+		}
+		if (!gameState.currentFloor().get(xx, yy).isTransparent()) {
+			return false;
+		}
+	}
+	return true;
+}
+
 class Floor extends Tile {
 	constructor(x, y) {
 		super(x, y);
@@ -505,6 +612,19 @@ class Floor extends Tile {
 		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !this.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
+		} else if (RENDER_MODE == RECIPROCAL_LINE_OF_SIGHT) {
+			if (this.hasLineOfSight) {
+				fill(255);
+				stroke(255);
+				text('O', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			    if (canSeePlayer(this.x, this.y)) {
+					text('0', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+				}				
+			} else if (canSeePlayer(this.x, this.y)) {
+				fill(255);
+				stroke(255);
+				text('/', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			} 
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);

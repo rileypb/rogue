@@ -1,3 +1,13 @@
+LOS_ADAM_MIL = 0;
+LOS_ORIGINAL = 1;
+LOS_DIAMOND_WALLS = 2;
+LOS_MRPAS = 3;
+// LOS_ALGORITHM = LOS_ORIGINAL;
+// LOS_ALGORITHM = LOS_ADAM_MIL;
+// LOS_ALGORITHM = LOS_DIAMOND_WALLS;
+LOS_ALGORITHM = LOS_MRPAS;
+
+
 class Player {
 	MAX_HEALTH = 100;
 
@@ -13,6 +23,49 @@ class Player {
 	}
 	
 	calculateLineOfSight(floorPlan) {
+		if (LOS_ALGORITHM == LOS_ORIGINAL) {
+			this.calculateLineOfSightOld(floorPlan);
+		} else if (LOS_ALGORITHM == LOS_ADAM_MIL) {
+			this.calculateLineOfSightAdamMil(floorPlan);
+		} else if (LOS_ALGORITHM == LOS_DIAMOND_WALLS) {
+			this.calculateLineOfSightDiamondWalls(floorPlan);
+		} else if (LOS_ALGORITHM == LOS_MRPAS) {
+			this.calculateLineOfSightMrPas(floorPlan);
+		}
+	}
+
+	calculateLineOfSightAdamMil(floorPlan) {
+		for (let tile of floorPlan.tiles) {
+			tile.hasLineOfSight = false;
+		}
+
+		let viz = createAdamMilVisibility(floorPlan, this);
+
+		viz.compute(new LevelPoint(this.x, this.y), 50);
+	}
+
+	calculateLineOfSightDiamondWalls(floorPlan) {
+		for (let tile of floorPlan.tiles) {
+			tile.hasLineOfSight = false;
+		}
+
+		let viz = createDiamondWallsVisibility(floorPlan, this);
+
+		viz.compute(new LevelPoint(this.x, this.y), 50);
+	}
+
+	calculateLineOfSightMrPas(floorPlan) {
+		for (let tile of floorPlan.tiles) {
+			tile.hasLineOfSight = false;
+		}
+
+		let viz = createMRPASVisibility(floorPlan, this);
+
+		viz.compute([this.x, this.y], 50);
+
+	}
+
+	calculateLineOfSightOld(floorPlan) {
 		for (let i = 0; i < floorPlan.width; i++) {
 			for (let j = 0; j < floorPlan.height; j++) {
 				floorPlan.get(i, j).hasLineOfSight = false;
