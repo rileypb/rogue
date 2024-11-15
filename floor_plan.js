@@ -201,7 +201,7 @@ class FloorPlan {
 				dy = ySpace - 1;
 			}
 			let isLava = Math.random() < 0.1;
-			let isWater = Math.random() < 0.01;
+			let isWater = Math.random() < 0.1;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
 			for (let xx = x - dx; xx < x + dx; xx++) {
@@ -827,7 +827,8 @@ class Water extends Tile {
 
 	render() {
 		// this.lightSource.updateFlickerFactor();
-		let useColor = lerpColor(this.lightSource.getLight(), this.light, 0.5);
+		let c = color(this.light[0], this.light[1], this.light[2]);
+		let useColor = lerpColor(this.lightSource.getLight(), c, 0.5);
 		fill(useColor);
 		stroke(useColor);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
