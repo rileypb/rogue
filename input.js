@@ -191,6 +191,9 @@ class AutoMoveTask extends Task {
 					this.autoMoveInProgress = false;
 				}
 			}
+			else {
+				this.autoMoveInProgress = false;
+			}
 		}
 		this.countdown = 1;
 		return 0;

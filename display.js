@@ -40,20 +40,27 @@ function drawFloorPlan() {
 	}
 }
 
+let pulse = 0;
+let pulseDirection = 1;
+const PULSE_MAGNITUDE = 5;
+
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
 	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
 	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
-	// ellipse(x * GRID_SIZE_X, y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-	let path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
-	if (path) {
+	if (autoMoveTask.autoMoveInProgress) {
+		x = path[0].x;
+		y = path[0].y;
+	}
+	let localPath = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
+	if (localPath) {
 		noStroke();
-		for (let i = path.length - 1; i > 0; i--) {
-			let tile = path[i];
+		for (let i = localPath.length - 1; i > 0; i--) {
+			let tile = localPath[i];
 			fill(255, 255, 255, 128);
 			// rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-			let nextTile = path[i - 1];
+			let nextTile = localPath[i - 1];
 			let dx = nextTile.x - tile.x;
 			let dy = nextTile.y - tile.y;
 			if (dx == 1 && dy == 0) {
@@ -82,11 +89,11 @@ function drawCursor() {
 				text('↖', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
 			}
 		}
-		if (path.length > 0) {
+		if (localPath.length > 0) {
 			fill(255, 255, 255, 128);
-			ellipse((path[0].x+0.5) * GRID_SIZE_X, (path[0].y+0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			ellipse((localPath[0].x+0.5) * GRID_SIZE_X, (localPath[0].y+0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(0);
-			text('⌖', (path[0].x + 0) * GRID_SIZE_X, (path[0].y + 0.75) * GRID_SIZE_Y);
+			text('⌖', (localPath[0].x + 0) * GRID_SIZE_X, (localPath[0].y + 0.75) * GRID_SIZE_Y);
 		}
 	} else {
 		fill(255, 0, 0, 128);
@@ -96,6 +103,7 @@ function drawCursor() {
 		noStroke();
 		text('X', (x + 0.2) * GRID_SIZE_X, (y + 0.85) * GRID_SIZE_Y);
 	}
+	
 }
 
 function drawPlayer() {
