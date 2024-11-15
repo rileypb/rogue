@@ -11,8 +11,17 @@ const FONT_NAME = 'monospace';
 const MAP_WIDTH = 60;
 const MAP_HEIGHT = 60;
 
-const CANVAS_WIDTH = GRID_SIZE_X * MAP_WIDTH;
-const CANVAS_HEIGHT = GRID_SIZE_Y * MAP_HEIGHT;
+let CANVAS_WIDTH;
+let CANVAS_HEIGHT;
+let MAP_PIXEL_WIDTH = GRID_SIZE_X * MAP_WIDTH;
+let MAP_PIXEL_HEIGHT = GRID_SIZE_Y * MAP_HEIGHT;
+
+let drawLeft = 0;
+let drawTop = 0;
+let drawRight = 0;
+let drawBottom = 0;
+let hMargin = 0;
+let vMargin = 0;
 
 const Q = 81;
 const W = 87;
@@ -38,8 +47,12 @@ RENDER_MODE = NORMAL;
 let autoMoveInProgress = false;
 
 function setup() {
+	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
+	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
+
 	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 	cursor(CROSS);
+
 	// taskManager.addTask(counterTask);
 	taskManager.addTask(inputTask);
 	autoMoveTask = new AutoMoveTask();
@@ -71,10 +84,58 @@ function setupGameState(gameState) {
 	}
 	flickerTask = new FlickerTask(gameState.currentFloor());
 	taskManager.addTask(flickerTask);
+
+	hMargin = 6 * GRID_SIZE_X;
+	vMargin = 6 * GRID_SIZE_Y;
+
+	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2;
+	if (drawLeft < 0) {
+		drawLeft = 0;
+	}
+	drawRight = drawLeft + CANVAS_WIDTH;
+	if (drawRight > MAP_PIXEL_WIDTH) {
+		drawRight = MAP_PIXEL_WIDTH;
+		drawLeft = drawRight - CANVAS_WIDTH;
+	}
+
+	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2;
+	if (drawTop < 0) {
+		drawTop = 0;
+	}
+	drawBottom = drawTop + CANVAS_HEIGHT;
+	if (drawBottom > MAP_PIXEL_HEIGHT) {
+		drawBottom = MAP_PIXEL_HEIGHT;
+		drawTop = drawBottom - CANVAS_HEIGHT;
+	}
+	console.log(drawLeft, drawTop, drawRight, drawBottom);
 }
+
+
 
 function draw() {
 	taskManager.runTasks();
+
+	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2;
+	if (drawLeft < 0) {
+		drawLeft = 0;
+	}
+	drawRight = drawLeft + CANVAS_WIDTH;
+	if (drawRight > MAP_PIXEL_WIDTH) {
+		drawRight = MAP_PIXEL_WIDTH;
+		drawLeft = drawRight - CANVAS_WIDTH;
+	}
+
+	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2;
+	if (drawTop < 0) {
+		drawTop = 0;
+	}
+	drawBottom = drawTop + CANVAS_HEIGHT;
+	if (drawBottom > MAP_PIXEL_HEIGHT) {
+		drawBottom = MAP_PIXEL_HEIGHT;
+		drawTop = drawBottom - CANVAS_HEIGHT;
+	}
+	console.log(drawLeft, drawTop, drawRight, drawBottom);
+
 	// updateLight(gameState.currentFloor());
 	//render();
 	fill(255);

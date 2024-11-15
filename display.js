@@ -1,6 +1,8 @@
 
 function render() {
 	background(0);
+	resetMatrix();
+	translate(-drawLeft, -drawTop);
 	drawFloorPlan();
 	drawEnemies();
 	drawPlayer();
@@ -41,8 +43,8 @@ function drawFloorPlan() {
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
-	let x = Math.floor(mouseX / GRID_SIZE_X);
-	let y = Math.floor(mouseY / GRID_SIZE_Y);
+	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
+	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
 	// ellipse(x * GRID_SIZE_X, y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 	let path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 	if (path) {
