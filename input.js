@@ -46,7 +46,7 @@ class InputTask extends Task {
 let path = null;
 
 
-function mousePressed() {
+function mouseReleased() {
 	let x = Math.floor(mouseX / GRID_SIZE_X);
 	let y = Math.floor(mouseY / GRID_SIZE_Y);
 	let targetTile = gameState.currentFloor().get(x, y);
