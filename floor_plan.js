@@ -1,9 +1,12 @@
 class Tile {
 	constructor(x, y) {
+		if (x >= MAP_WIDTH || y >= MAP_HEIGHT || x < 0 || y < 0) {
+			console.log("Tile out of bounds: " + x + ", " + y);
+		}
 		this.x = x;
 		this.y = y;
 
-		this.light = color(0, 0, 0);
+		this.light = [0, 0, 0];
 		this.feature = null;
 
 		this.hasBeenSeen = false;
@@ -71,7 +74,7 @@ class Tile {
 	}
 
 	hasSufficientLight() {
-		return this.light._getBrightness() > LIGHT_THRESHOLD;
+		return this.light[0] + this.light[1] + this.light[2] > LIGHT_THRESHOLD;
 	}
 
 	onEnter(player) {
@@ -343,8 +346,8 @@ class FloorPlan {
 
 	generateOneRoom() {
 		// fill with floor tiles
-		for (let x = 0; x < this.width + 1; x++) {
-			for (let y = 0; y < this.height + 1; y++) {
+		for (let x = 0; x < this.width; x++) {
+			for (let y = 0; y < this.height; y++) {
 				this.tiles[x + y * this.width] = new Floor(x, y);
 			}
 		}
@@ -393,8 +396,8 @@ class FloorPlan {
 
 	generateRandomWalls() {
 		// fill with floor tiles
-		for (let x = 0; x < this.width + 1; x++) {
-			for (let y = 0; y < this.height + 1; y++) {
+		for (let x = 0; x < this.width; x++) {
+			for (let y = 0; y < this.height; y++) {
 				this.tiles[x + y * this.width] = new Floor(x, y);
 			}
 		}
@@ -561,11 +564,9 @@ class Wall extends Tile {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			colorMode(HSB);
-			let c = color(this.light._getHue(), 0.5 * this.light._getSaturation(), this.light._getBrightness() * 0.5);
+			let c = color(Math.min(128, this.light[0] * 0.5), Math.min(128, this.light[1] * 0.5), Math.min(128, this.light[2] * 0.5));
 			fill(c);
 			noStroke();
-			colorMode(RGB);
 			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(this.light);
 			stroke(this.light);
@@ -630,11 +631,9 @@ class Floor extends Tile {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			colorMode(HSB);
-			let c = color(this.light._getHue(), 0.5 * this.light._getSaturation(), this.light._getBrightness() * 0.5);
+			let c = color(Math.min(128, this.light[0] * 0.5), Math.min(128, this.light[1] * 0.5), Math.min(128, this.light[2] * 0.5));
 			fill(c);
 			noStroke();
-			colorMode(RGB);
 			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(this.light);
 			stroke(this.light);
@@ -697,11 +696,9 @@ class Lamp extends Tile {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			colorMode(HSB);
-			let c = color(this.light._getHue(), 0.5 * this.light._getSaturation(), this.light._getBrightness() * 0.5);
+			let c = color(Math.min(128, this.light[0] * 0.5), Math.min(128, this.light[1] * 0.5), Math.min(128, this.light[2] * 0.5));
 			fill(c);
 			noStroke();
-			colorMode(RGB);
 			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(this.light);
 			stroke(this.light);

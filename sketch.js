@@ -8,8 +8,8 @@ let autoMoveTask;
 const GRID_SIZE_X = 16;
 const GRID_SIZE_Y = 16;
 const FONT_NAME = 'monospace';
-const MAP_WIDTH = 90;
-const MAP_HEIGHT = 50;
+const MAP_WIDTH = 60;
+const MAP_HEIGHT = 60;
 
 const CANVAS_WIDTH = GRID_SIZE_X * MAP_WIDTH;
 const CANVAS_HEIGHT = GRID_SIZE_Y * MAP_HEIGHT;

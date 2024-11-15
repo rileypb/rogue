@@ -36,10 +36,21 @@ class LightSource {
 
 let playerLightSource;
 
+function subtractLight(floorplan, lightSource) {
+	for (let tile of floorplan.tiles) {
+		if (tile && tile.isTransparent()) {
+			tile.light[0] -= lightSource.cache[tile.x + tile.y * MAP_WIDTH][0];
+			tile.light[1] -= lightSource.cache[tile.x + tile.y * MAP_WIDTH][1];
+			tile.light[2] -= lightSource.cache[tile.x + tile.y * MAP_WIDTH][2];
+		}
+	}
+}
+
 function updateLight(floorplan, player, refreshAll = false) {
 	console.log("updateLight");
 	let allLightSources = [];
 	// cast player's torchlight
+	subtractLight(floorplan, playerLightSource);
 	updateLightFromPosition(floorplan, player.x, player.y, playerLightSource);
 	allLightSources.push(playerLightSource);
 
@@ -48,6 +59,7 @@ function updateLight(floorplan, player, refreshAll = false) {
 		if (tile && tile.isLit()) {
 			allLightSources.push(tile.lightSource);
 			if (refreshAll || tile.lightSource.isDirty) {
+				subtractLight(floorplan, tile.lightSource);
 				updateLightFromPosition(floorplan, tile.x, tile.y, tile.lightSource);
 				tile.lightSource.isDirty = false;
 			}
@@ -58,26 +70,31 @@ function updateLight(floorplan, player, refreshAll = false) {
 		if (monster.lightSource) {
 			allLightSources.push(monster.lightSource);
 			if (refreshAll || monster.lightSource.isDirty) {
+				subtractLight(floorplan, monster.lightSource);
 				updateLightFromPosition(floorplan, monster.x, monster.y, monster.lightSource);
 				monster.lightSource.isDirty = false;
 			}
 		}
 	}
 
-	for (let tile of floorplan.tiles) {
-		let totalRed = 0;
-		let totalGreen = 0;
-		let totalBlue = 0;
-		for (let lightSource of allLightSources) {
-			let r = lightSource.cache[tile.x + tile.y * MAP_WIDTH][0] * lightSource.flickerFactor;
-			let g = lightSource.cache[tile.x + tile.y * MAP_WIDTH][1] * lightSource.flickerFactor;
-			let b = lightSource.cache[tile.x + tile.y * MAP_WIDTH][2] * lightSource.flickerFactor;
-			totalRed += r;
-			totalGreen += g;
-			totalBlue += b;
-		}
-		tile.light = color(totalRed, totalGreen, totalBlue);
-	}
+	// for (let tile of floorplan.tiles) {
+	// 	let totalRed = 0;
+	// 	let totalGreen = 0;
+	// 	let totalBlue = 0;
+	// 	for (let lightSource of allLightSources) {
+	// 		if (!lightSource.cache[tile.x + tile.y * MAP_WIDTH]) {
+	// 			// console.log("no cache for tile", tile.x, tile.y);
+	// 			continue;
+	// 		}
+	// 		let r = lightSource.cache[tile.x + tile.y * MAP_WIDTH][0] * lightSource.flickerFactor;
+	// 		let g = lightSource.cache[tile.x + tile.y * MAP_WIDTH][1] * lightSource.flickerFactor;
+	// 		let b = lightSource.cache[tile.x + tile.y * MAP_WIDTH][2] * lightSource.flickerFactor;
+	// 		totalRed += r;
+	// 		totalGreen += g;
+	// 		totalBlue += b;
+	// 	}
+	// 	tile.light = [totalRed, totalGreen, totalBlue];
+	// }
 
 	//mark all non-transparent tiles as having light if they are adjacent to a transparent tile with light. The light should be the average of the adjacent lights.
 	for (let tile of floorplan.tiles) {
@@ -97,14 +114,14 @@ function updateLight(floorplan, player, refreshAll = false) {
 				let d1 = (neighborTile.x - gameState.player.x) ** 2 + (neighborTile.y - gameState.player.y) ** 2;
 				let d2 = (tile.x - gameState.player.x) ** 2 + (tile.y - gameState.player.y) ** 2;
 				if (d1 < d2) {
-					red += neighborTile.light._getRed();
-					green += neighborTile.light._getGreen();
-					blue += neighborTile.light._getBlue();
+					red += neighborTile.light[0];
+					green += neighborTile.light[1];
+					blue += neighborTile.light[2];
 					neighborCount++;
 				}
 			}
 			if (neighborCount > 0) {
-				tile.light = color(red / neighborCount, green / neighborCount, blue / neighborCount);
+				tile.light = [red / neighborCount, green / neighborCount, blue / neighborCount];
 			}
 		}
 	}
@@ -136,6 +153,10 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 				let g = light._getGreen();
 				let b = light._getBlue();
 				lightSource.cache[x + y * MAP_WIDTH] = [r * fallOffValues[distance], g * fallOffValues[distance], b * fallOffValues[distance]];
+				let tile = floorplan.get(x, y);
+				tile.light[0] += r * fallOffValues[distance];
+				tile.light[1] += g * fallOffValues[distance];
+				tile.light[2] += b * fallOffValues[distance];
 			}
 		}
 	}
