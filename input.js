@@ -50,6 +50,10 @@ function touchStarted() {
 	touchesCache = touches;
 }
 
+function touchMoved() {
+	console.log(touches);
+}
+
 function touchEnded() {
 	if (touchesCache.length == 1) {
 		for (let touch of touchesCache) {

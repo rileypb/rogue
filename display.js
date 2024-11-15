@@ -49,7 +49,7 @@ function drawCursor() {
 	stroke(255, 255, 255, 64);
 	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
 	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
-	if (autoMoveTask.autoMoveInProgress) {
+	if (autoMoveTask.autoMoveInProgress && path.length > 0) {
 		x = path[0].x;
 		y = path[0].y;
 	}

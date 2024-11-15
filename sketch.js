@@ -93,8 +93,8 @@ function setupGameState(gameState) {
 		drawLeft = 0;
 	}
 	drawRight = drawLeft + CANVAS_WIDTH;
-	if (drawRight > MAP_PIXEL_WIDTH) {
-		drawRight = MAP_PIXEL_WIDTH;
+	if (drawRight > MAP_PIXEL_WIDTH + 1) {
+		drawRight = MAP_PIXEL_WIDTH + 1;
 		drawLeft = drawRight - CANVAS_WIDTH;
 	}
 
@@ -103,8 +103,8 @@ function setupGameState(gameState) {
 		drawTop = 0;
 	}
 	drawBottom = drawTop + CANVAS_HEIGHT;
-	if (drawBottom > MAP_PIXEL_HEIGHT) {
-		drawBottom = MAP_PIXEL_HEIGHT;
+	if (drawBottom > MAP_PIXEL_HEIGHT + 1) {
+		drawBottom = MAP_PIXEL_HEIGHT + 1;
 		drawTop = drawBottom - CANVAS_HEIGHT;
 	}
 	console.log(drawLeft, drawTop, drawRight, drawBottom);
@@ -134,7 +134,6 @@ function draw() {
 		drawBottom = MAP_PIXEL_HEIGHT;
 		drawTop = drawBottom - CANVAS_HEIGHT;
 	}
-	console.log(drawLeft, drawTop, drawRight, drawBottom);
 
 	// updateLight(gameState.currentFloor());
 	//render();
