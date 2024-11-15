@@ -106,7 +106,6 @@ function drawEnemies() {
 	for (let monster of gameState.currentFloor().monsters) {
 		tile = gameState.currentFloor().get(monster.x, monster.y);
 		if (tile.visible) {
-			console.log(tile);
 			monster.draw();
 		}
 	}

@@ -422,7 +422,6 @@ class FloorPlan {
 			if (y + dy >= this.height) {
 				dy = this.height - y - 1;
 			}
-			console.log("wall at " + x + ", " + y, " of size " + dx + ", " + dy);
 			for (let xx = x; xx < x + dx; xx++) {
 				for (let yy = y; yy < Math.min(this.height, y + dy); yy++) {
 					this.set(xx, yy, new Wall(xx, yy, Wall.WOOD));

@@ -13,7 +13,6 @@ class InputTask extends Task {
 	run() {
 		if (!this.repeating) {
 			if (keyIsPressed) {
-				console.log("repeating and key is pressed");
 				this.emittedKeyCode = keyCode;
 				this.repeating = true;
 				this.countdown = this.INITIAL_DELAY;
@@ -45,22 +44,32 @@ class InputTask extends Task {
 
 let path = null;
 
+let touchesCache = [];
+
+function touchStarted() {
+	touchesCache = touches;
+}
 
 function touchEnded() {
-	let x = Math.floor(touch.x / GRID_SIZE_X);
-	let y = Math.floor(touch.y / GRID_SIZE_Y);
-	let targetTile = gameState.currentFloor().get(x, y);
-	if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
-		return;
+	if (touchesCache.length == 1) {
+		for (let touch of touchesCache) {
+			let x = Math.floor(touch.x / GRID_SIZE_X);
+			let y = Math.floor(touch.y / GRID_SIZE_Y);
+			let targetTile = gameState.currentFloor().get(x, y);
+			if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
+				return;
+			}
+			path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
+			if (!path) {
+				return;
+			}
+			if (path.length > 0) {
+				autoMoveTask.path = path;
+				autoMoveTask.autoMoveInProgress = true;
+			}
+		}
 	}
-	path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
-	if (!path) {
-		return;
-	}
-	if (path.length > 0) {
-		autoMoveTask.path = path;
-		autoMoveTask.autoMoveInProgress = true;
-	}
+	touchesCache = [];
 }
 
 function mouseReleased() {

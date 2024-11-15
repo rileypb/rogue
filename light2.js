@@ -49,7 +49,6 @@ function subtractLight(floorplan, lightSource) {
 }
 
 function updateLight(floorplan, player, refreshAll = false) {
-	console.log("updateLight");
 	let allLightSources = [];
 	// cast player's torchlight
 	subtractLight(floorplan, playerLightSource);
