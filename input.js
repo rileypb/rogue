@@ -46,6 +46,23 @@ class InputTask extends Task {
 let path = null;
 
 
+function touchEnded() {
+	let x = Math.floor(touch.x / GRID_SIZE_X);
+	let y = Math.floor(touch.y / GRID_SIZE_Y);
+	let targetTile = gameState.currentFloor().get(x, y);
+	if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
+		return;
+	}
+	path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
+	if (!path) {
+		return;
+	}
+	if (path.length > 0) {
+		autoMoveTask.path = path;
+		autoMoveTask.autoMoveInProgress = true;
+	}
+}
+
 function mouseReleased() {
 	let x = Math.floor(mouseX / GRID_SIZE_X);
 	let y = Math.floor(mouseY / GRID_SIZE_Y);
