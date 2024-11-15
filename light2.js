@@ -3,6 +3,8 @@ const LIGHT_THRESHOLD = 0.3;
 const MAX_LIGHT_DISTANCE = 20;
 const MEMORY_LIGHT = 40;
 
+let globalFlickerFactor = 0;
+
 let fallOffValues = [];
 
 class LightSource {

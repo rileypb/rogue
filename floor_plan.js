@@ -200,8 +200,8 @@ class FloorPlan {
 			if (dy > ySpace) {
 				dy = ySpace - 1;
 			}
-			let isLava = Math.random() < 0.1;
-			let isWater = Math.random() < 0.1;
+			let isLava = Math.random() < 0.03;
+			let isWater = Math.random() < 0.03;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
 			for (let xx = x - dx; xx < x + dx; xx++) {
@@ -631,7 +631,7 @@ class Floor extends Tile {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			let c = color(Math.min(128, this.light[0] * 0.5), Math.min(128, this.light[1] * 0.5), Math.min(128, this.light[2] * 0.5));
+			let c = color(Math.min(128, this.light[0] * 0.5 + globalFlickerFactor), Math.min(128, this.light[1] * 0.5 + globalFlickerFactor), Math.min(128, this.light[2] * 0.5 + globalFlickerFactor));
 			fill(c);
 			noStroke();
 			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);

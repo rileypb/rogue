@@ -65,6 +65,7 @@ class FlickerTask extends Task {
   }
 
   run() {
+	globalFlickerFactor = Math.random() * 6 - 3;
 	this.floorPlan.updateFlicker();
 	playerLightSource.updateFlickerFactor();
 	updateLight(this.floorPlan, gameState.player);
