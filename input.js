@@ -53,8 +53,8 @@ function touchStarted() {
 function touchEnded() {
 	if (touchesCache.length == 1) {
 		for (let touch of touchesCache) {
-			let x = Math.floor(touch.x / GRID_SIZE_X);
-			let y = Math.floor(touch.y / GRID_SIZE_Y);
+			let x = Math.floor((touch.x + drawLeft) / GRID_SIZE_X);
+			let y = Math.floor((touch.y + drawTop) / GRID_SIZE_Y);
 			let targetTile = gameState.currentFloor().get(x, y);
 			if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
 				return;
