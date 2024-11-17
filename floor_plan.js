@@ -150,6 +150,14 @@ class FloorPlan {
 		return neighbors;
 	}
 
+	getColor(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return color(0, 0, 0);
+		}
+		let l = this.get(x, y).light;
+		return color(0.5 * l[0], 0.5 * l[1], 0.5 * l[2]);
+	}
+
 	updateFlicker() {
 		for (let tile of this.tiles) {
 			tile.updateFlickerFactor();
@@ -630,6 +638,39 @@ class Floor extends Tile {
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
+			// let f = gameState.currentFloor();
+			// let colors = [
+			// 	[ f.getColor(this.x - 1, this.y - 1), 
+			// 	  f.getColor(this.x, this.y - 1),
+			// 	  f.getColor(this.x + 1, this.y - 1)
+			// 	],
+			// 	[ f.getColor(this.x - 1, this.y),
+			// 	  f.getColor(this.x, this.y),
+			// 	  f.getColor(this.x + 1, this.y)
+			// 	],
+			// 	[ f.getColor(this.x - 1, this.y + 1),
+			// 	  f.getColor(this.x, this.y + 1),
+			// 	  f.getColor(this.x + 1, this.y + 1)
+			// 	]
+			// ];
+			// let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
+			// 					 lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
+			// 					 lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
+			// 					 lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
+			// ];
+
+			// beginShape(TESS);
+			// fill(cornerColors[0]);
+			// noStroke();
+			// vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			// fill(cornerColors[1]);
+			// vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			// fill(cornerColors[3]);
+			// vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			// fill(cornerColors[2]);
+			// vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			// endShape(CLOSE);
+
 			let c = color(Math.min(128, this.light[0] * 0.5 + globalFlickerFactor), Math.min(128, this.light[1] * 0.5 + globalFlickerFactor), Math.min(128, this.light[2] * 0.5 + globalFlickerFactor));
 			fill(c);
 			noStroke();

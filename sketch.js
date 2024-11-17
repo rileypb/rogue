@@ -50,8 +50,11 @@ function setup() {
 	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
 
-	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
 	cursor(CROSS);
+
+	let theFont = loadFont("https://fonts.googleapis.com/css2?family=Comfortaa&family=Open+Sans:wght@400;700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+	textFont(theFont);
 
 	// taskManager.addTask(counterTask);
 	taskManager.addTask(inputTask);
