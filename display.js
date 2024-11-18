@@ -29,7 +29,7 @@ function drawFloorPlan() {
 				if (!neighbor.visible) {
 					let t = gameState.currentFloor().get(neighbor.x, neighbor.y);
 					if (!t.rendered) {
-						t.render();
+						t.render(true);
 						t.rendered = true;
 					}
 				}

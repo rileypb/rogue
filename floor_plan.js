@@ -1,3 +1,11 @@
+function lerpArray(a, b, t) {
+	return [a[0] * (1 - t) + b[0] * t, a[1] * (1 - t) + b[1] * t, a[2] * (1 - t) + b[2] * t];
+}
+
+function arrayToColor(a) {
+	return color(a[0], a[1], a[2]);
+}
+
 class Tile {
 	constructor(x, y) {
 		if (x >= MAP_WIDTH || y >= MAP_HEIGHT || x < 0 || y < 0) {
@@ -112,21 +120,25 @@ class Tile {
 				f.getColor(this.x + 1, this.y + 1)
 			]
 		];
-		let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
-								lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
-								lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
-								lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
+		let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
+								lerpArray(lerpArray(colors[0][1], colors[1][2], 0.5), lerpArray(colors[1][1], colors[0][2], 0.5), 0.5),
+								lerpArray(lerpArray(colors[1][0], colors[2][1], 0.5), lerpArray(colors[2][0], colors[1][1], 0.5), 0.5),
+								lerpArray(lerpArray(colors[1][1], colors[2][2], 0.5), lerpArray(colors[2][1], colors[1][2], 0.5), 0.5)
 		];
+				// let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
+				// 				lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
+				// 				lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
+				// 				lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
 
 		beginShape(TESS);
-		fill(cornerColors[0]);
+		fill(arrayToColor(cornerColors[0]));
 		noStroke();
 		vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-		fill(cornerColors[1]);
+		fill(arrayToColor(cornerColors[1]));
 		vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-		fill(cornerColors[3]);
+		fill(arrayToColor(cornerColors[3]));
 		vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
-		fill(cornerColors[2]);
+		fill(arrayToColor(cornerColors[2]));
 		vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		endShape(CLOSE);
 	}
@@ -192,13 +204,13 @@ class FloorPlan {
 
 	getColor(x, y) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-			return color(0, 0, 0);
+			return [0, 0, 0];
 		}
 		if (!this.get(x, y).visible) {
-			return color(0, 0, 0);
+			return [0, 0, 0];
 		}
 		let l = this.get(x, y).getLight();
-		return color(0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor);
+		return [0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor];
 	}
 
 	updateFlicker() {
@@ -415,34 +427,34 @@ class FloorPlan {
 		// place a lamp in the center
 		let x = Math.floor(this.width / 2);
 		let y = Math.floor(this.height / 2);
-		this.tiles[x + y * this.width] = new Lamp(x, y, color(255, 0, 0));
+		this.tiles[x + y * this.width] = new Lamp(x, y, [255, 128, 0]);
 		// x = Math.floor(2*this.width / 3) - 8;
 		// y = Math.floor(2*this.height / 3) - 2;
 		// this.tiles[x + y * this.width] = new Lamp(x, y, color(255, 255, 0));
 
 		// place a wall near the lamp
-		x = Math.floor(this.width / 2) + 2;
-		y = Math.floor(this.height / 2) + 2;
-		this.tiles[x + y * this.width] = new Wall(x, y);
-		this.tiles[x + (y + 1) * this.width] = new Wall(x, y + 1);
-		this.tiles[x + (y + 2) * this.width] = new Wall(x, y + 2);
-		this.tiles[x + (y + 3) * this.width] = new Wall(x, y + 3);
-		this.tiles[x + (y + 4) * this.width] = new Wall(x, y + 4);
-		this.tiles[x + (y + 5) * this.width] = new Wall(x, y + 5);
-		this.tiles[x + (y + 5) * this.width].isSpecial = true;
-		// and near the other lamp
-		x = Math.floor(2 * this.width / 3) - 6;
-		y = Math.floor(2 * this.height / 3) - 3;
-		while (x < 0) {
-			x++;
-		}
-		while (y < 0) {
-			y++;
-		}
-		this.tiles[x + y * this.width] = new Wall(x, y);
-		this.tiles[x + (y - 1) * this.width] = new Wall(x, y - 1);
-		this.tiles[x + (y - 2) * this.width] = new Wall(x, y - 2);
-		this.tiles[x + (y - 3) * this.width] = new Wall(x, y - 3);
+		// x = Math.floor(this.width / 2) + 2;
+		// y = Math.floor(this.height / 2) + 2;
+		// this.tiles[x + y * this.width] = new Wall(x, y);
+		// this.tiles[x + (y + 1) * this.width] = new Wall(x, y + 1);
+		// this.tiles[x + (y + 2) * this.width] = new Wall(x, y + 2);
+		// this.tiles[x + (y + 3) * this.width] = new Wall(x, y + 3);
+		// this.tiles[x + (y + 4) * this.width] = new Wall(x, y + 4);
+		// this.tiles[x + (y + 5) * this.width] = new Wall(x, y + 5);
+		// this.tiles[x + (y + 5) * this.width].isSpecial = true;
+		// // and near the other lamp
+		// x = Math.floor(2 * this.width / 3) - 6;
+		// y = Math.floor(2 * this.height / 3) - 3;
+		// while (x < 0) {
+		// 	x++;
+		// }
+		// while (y < 0) {
+		// 	y++;
+		// }
+		// this.tiles[x + y * this.width] = new Wall(x, y);
+		// this.tiles[x + (y - 1) * this.width] = new Wall(x, y - 1);
+		// this.tiles[x + (y - 2) * this.width] = new Wall(x, y - 2);
+		// this.tiles[x + (y - 3) * this.width] = new Wall(x, y - 3);
 	}
 
 	generateRandomWalls() {
@@ -596,7 +608,7 @@ class Wall extends Tile {
 		return true;
 	}
 
-	render() {
+	render(asNeighbor=false) {
 		let resultingLight = this.light;
 		if (this.kind == this.WOOD) {
 			resultingLight = color(139, 69, 19);
@@ -611,7 +623,9 @@ class Wall extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			// this.drawDefaultBackground();
+			if (asNeighbor) {
+				this.drawDefaultBackground();
+			}
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
@@ -653,7 +667,7 @@ class Floor extends Tile {
 		super(x, y);
 	}
 
-	render() {
+	render(asNeighbor=false) {
 		fill(this.light);
 		stroke(this.light);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
@@ -676,7 +690,9 @@ class Floor extends Tile {
 				text('/', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 			} 
 		} else if (this.hasBeenSeen && !this.visible) {
-			//this.drawDefaultBackground();
+			if (asNeighbor) {
+				this.drawDefaultBackground();
+			}
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
@@ -730,7 +746,7 @@ class Lamp extends Tile {
 		return false;
 	}
 
-	render() {
+	render(asNeighbor=false) {
 		this.updateFlickerFactor();
 		fill(this.getLight());
 		stroke(this.getLight());
@@ -741,7 +757,9 @@ class Lamp extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			// this.drawDefaultBackground();
+			if (asNeighbor) {
+				this.drawDefaultBackground();
+			}
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
@@ -872,7 +890,7 @@ class Water extends Tile {
 	}
 
 
-	render() {
+	render(asNeighbor=false) {
 		// this.lightSource.updateFlickerFactor();
 		let c = color(this.light[0], this.light[1], this.light[2]);
 		let ls = this.lightSource.getLight();
@@ -887,7 +905,9 @@ class Water extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			// this.drawDefaultBackground();
+			if (asNeighbor) {
+				this.drawDefaultBackground();
+			}
 			fill(MEMORY_LIGHT);
 			noStroke();
 		} else {
@@ -1010,7 +1030,7 @@ class Lava extends Tile {
 	}
 
 
-	render() {
+	render(asNeighbor=false) {
 		// this.updateFlickerFactor();
 		fill(this.getLight());
 		stroke(this.getLight());
@@ -1021,6 +1041,9 @@ class Lava extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
+			if (asNeighbor) {
+				this.drawDefaultBackground();
+			}
 			fill(MEMORY_LIGHT);
 			noStroke();
 		} else {
@@ -1039,10 +1062,10 @@ class Lava extends Tile {
 					f.getColor(this.x + 1, this.y + 1, true)
 				]
 			];
-			let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
-									lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
-									lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
-									lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
+			let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
+			lerpArray(lerpArray(colors[0][1], colors[1][2], 0.5), lerpArray(colors[1][1], colors[0][2], 0.5), 0.5),
+			lerpArray(lerpArray(colors[1][0], colors[2][1], 0.5), lerpArray(colors[2][0], colors[1][1], 0.5), 0.5),
+			lerpArray(lerpArray(colors[1][1], colors[2][2], 0.5), lerpArray(colors[2][1], colors[1][2], 0.5), 0.5)
 			];
 
 			beginShape(TESS);
