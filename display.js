@@ -23,7 +23,7 @@ function drawFloorPlan() {
 			tile.render();
 			tile.rendered = true;
 		} 
-		if (tile.visible && tile.isTransparent()) {
+		if (tile.visible) {
 			let neighbors = gameState.currentFloor().getNeighbors(tile.x, tile.y);
 			for (let neighbor of neighbors) {
 				if (!neighbor.visible) {

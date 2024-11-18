@@ -634,7 +634,9 @@ class Wall extends Tile {
 			stroke(this.light);
 		}
 		let char = '#';
-		text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		if (!asNeighbor) {
+			text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		}
 	}
 }
 
@@ -702,7 +704,9 @@ class Floor extends Tile {
 			fill(c);
 			stroke(c);
 		}
-		text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		if (!asNeighbor) {
+			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		}
 	}
 
 	isEnterable() {
@@ -768,7 +772,9 @@ class Lamp extends Tile {
 			fill(this.light);
 			stroke(this.light);
 		}
-		text('o', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		if (!asNeighbor) {
+			text('o', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		}
 	}
 
 	updateFlickerFactor() {
@@ -1042,7 +1048,38 @@ class Lava extends Tile {
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
 			if (asNeighbor) {
-				this.drawDefaultBackground();
+				let f = gameState.currentFloor();
+				let colors = [
+					[ f.getColor(this.x - 1, this.y - 1, true), 
+						f.getColor(this.x, this.y - 1, true),
+						f.getColor(this.x + 1, this.y - 1, true)
+					],
+					[ f.getColor(this.x - 1, this.y, true),
+						f.getColor(this.x, this.y, true),
+						f.getColor(this.x + 1, this.y, true)
+					],
+					[ f.getColor(this.x - 1, this.y + 1, true),
+						f.getColor(this.x, this.y + 1, true),
+						f.getColor(this.x + 1, this.y + 1, true)
+					]
+				];
+				let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
+				lerpArray(lerpArray(colors[0][1], colors[1][2], 0.5), lerpArray(colors[1][1], colors[0][2], 0.5), 0.5),
+				lerpArray(lerpArray(colors[1][0], colors[2][1], 0.5), lerpArray(colors[2][0], colors[1][1], 0.5), 0.5),
+				lerpArray(lerpArray(colors[1][1], colors[2][2], 0.5), lerpArray(colors[2][1], colors[1][2], 0.5), 0.5)
+				];
+	
+				beginShape(TESS);
+				fill(cornerColors[0]);
+				noStroke();
+				vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+				fill(cornerColors[1]);
+				vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+				fill(cornerColors[3]);
+				vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+				fill(cornerColors[2]);
+				vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+				endShape(CLOSE);
 			}
 			fill(MEMORY_LIGHT);
 			noStroke();
