@@ -274,7 +274,7 @@ class FloorPlan {
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
 						if (Math.random() < 0.002) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 255, Math.random() * 255, Math.random() * 255]);
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 64, Math.random() * 64, Math.random() * 64]);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
@@ -1070,16 +1070,22 @@ class Lava extends Tile {
 				];
 	
 				beginShape(TESS);
-				fill(cornerColors[0]);
+				fill(arrayToColor(cornerColors[0]));
 				noStroke();
 				vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-				fill(cornerColors[1]);
+				fill(arrayToColor(cornerColors[1]));
 				vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-				fill(cornerColors[3]);
+				fill(arrayToColor(cornerColors[3]));
 				vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
-				fill(cornerColors[2]);
+				fill(arrayToColor(cornerColors[2]));
 				vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 				endShape(CLOSE);
+
+				// fill(color(255));
+				// text('*', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			} else {
+				fill(0,255,0);
+				// rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			}
 			fill(MEMORY_LIGHT);
 			noStroke();
@@ -1106,16 +1112,19 @@ class Lava extends Tile {
 			];
 
 			beginShape(TESS);
-			fill(cornerColors[0]);
+			fill(arrayToColor(cornerColors[0]));
 			noStroke();
 			vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-			fill(cornerColors[1]);
+			fill(arrayToColor(cornerColors[1]));
 			vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-			fill(cornerColors[3]);
+			fill(arrayToColor(cornerColors[3]));
 			vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
-			fill(cornerColors[2]);
+			fill(arrayToColor(cornerColors[2]));
 			vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 			endShape(CLOSE);
+
+			// fill(color(255));
+			// text('!', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		}
 		// if (this.visible) {
 		// 	rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);

@@ -18,7 +18,9 @@ function drawFloorPlan() {
 	for (let tile of floorPlan) {
 		if (tile.visible || ((RENDER_MODE == LINE_OF_SIGHT || RENDER_MODE == LINE_OF_SIGHT_PLUS) && tile.hasLineOfSight) || tile.hasBeenSeen) {
 			tile.render();
-			tile.rendered = true;
+			if (tile.visible) {
+				tile.rendered = true;
+			}
 		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			tile.render();
 			tile.rendered = true;
