@@ -46,15 +46,21 @@ RENDER_MODE = NORMAL;
 
 let autoMoveInProgress = false;
 
+let robotoMono;
+let b612Mono;
+
+function preload() {
+	robotoMono = loadFont("RobotoMono-Regular.ttf");
+	b612Mono = loadFont("B612Mono-Regular.ttf");
+}
+
 function setup() {
 	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
 
 	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
 	cursor(CROSS);
-
-	let theFont = loadFont("https://fonts.googleapis.com/css2?family=Comfortaa&family=Open+Sans:wght@400;700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
-	textFont(theFont);
+	textFont(b612Mono, GRID_SIZE_Y);
 
 	// taskManager.addTask(counterTask);
 	taskManager.addTask(inputTask);
@@ -65,9 +71,7 @@ function setup() {
 	for (let i = 0; i <= MAX_LIGHT_DISTANCE; i++) {
 		fallOffValues.push(LIGHT_FALL_OFF ** i);
 	}
-	textFont(FONT_NAME);
-	textSize(GRID_SIZE_Y);
-	playerLightSource = new LightSource(color(255, 255, 128), 0.1);
+	playerLightSource = new LightSource([255, 255, 255], 0.1);
 	gameState.player.calculateLineOfSight(gameState.currentFloor());
 	updateLight(gameState.currentFloor(), gameState.player);
 	gameState.player.calculateSight(gameState.currentFloor());
@@ -179,7 +183,6 @@ function draw() {
 		gameState.player.calculateSight(gameState.currentFloor());
 		render();
 	}
-
 }
 
 function keyPressed() {

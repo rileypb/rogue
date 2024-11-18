@@ -17,7 +17,7 @@ class LightSource {
 	}	
 
 	getLight() {
-		return color(this.color._getRed() * this.flickerFactor, this.color._getGreen() * this.flickerFactor, this.color._getBlue() * this.flickerFactor);
+		return [this.color[0] * this.flickerFactor, this.color[1] * this.flickerFactor, this.color[2] * this.flickerFactor];
 	}
 
 }
@@ -72,7 +72,7 @@ function updateLight(floorplan, player) {
 				}
 			}
 			if (neighborCount > 0) {
-				tile.light = color(red / neighborCount, green / neighborCount, blue / neighborCount);
+				tile.light = [red / neighborCount, green / neighborCount, blue / neighborCount];
 			}
 		}
 	}
@@ -110,7 +110,7 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 				let floorTile = floorplan.get(x, y);
 				if (floorTile != null) {
 					let existingLight = floorTile.light;
-					floorTile.light = color(existingLight._getRed() + light._getRed() * fallOffValues[Math.round(distance)], existingLight._getGreen() + light._getGreen() * fallOffValues[Math.round(distance)], existingLight._getBlue() + light._getBlue() * fallOffValues[Math.round(distance)]);
+					floorTile.light = [existingLight[0] + light[0] * fallOffValues[Math.round(distance)], existingLight[1] + light[1] * fallOffValues[Math.round(distance)], existingLight[2] + light[2] * fallOffValues[Math.round(distance)]];
 				}
 			}
 		}

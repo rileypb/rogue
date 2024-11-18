@@ -2,7 +2,8 @@
 function render() {
 	background(0);
 	resetMatrix();
-	translate(-drawLeft, -drawTop);
+	// translate(-drawLeft, -drawTop);
+	translate(-drawLeft-CANVAS_WIDTH/2, -drawTop-CANVAS_HEIGHT/2);	
 	drawFloorPlan();
 	drawEnemies();
 	drawPlayer();
@@ -12,30 +13,38 @@ function render() {
 function drawFloorPlan() {
 	let floorPlan = gameState.currentFloor().tiles;
 	for (let tile of floorPlan) {
-		// let tile = floorPlan[i];
+		tile.rendered = false;
+	}
+	for (let tile of floorPlan) {
 		if (tile.visible || ((RENDER_MODE == LINE_OF_SIGHT || RENDER_MODE == LINE_OF_SIGHT_PLUS) && tile.hasLineOfSight) || tile.hasBeenSeen) {
-			// if (tile.hasBeenSeen && !tile.visible) {
-			// 	fill(255);
-			// 	noStroke();
-			// 	rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-			// }
 			tile.render();
+			tile.rendered = true;
 		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
-			// fill(color(255,200,200));
-			// stroke(color(255,200,200));
-			// rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			tile.render();
+			tile.rendered = true;
 		} 
+		if (tile.visible && tile.isTransparent()) {
+			let neighbors = gameState.currentFloor().getNeighbors(tile.x, tile.y);
+			for (let neighbor of neighbors) {
+				if (!neighbor.visible) {
+					let t = gameState.currentFloor().get(neighbor.x, neighbor.y);
+					if (!t.rendered) {
+						t.render();
+						t.rendered = true;
+					}
+				}
+			}
+		}
 		if (!tile.visible){
 			fill(128, 128, 255, 16);
 			noStroke();
-			rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(255, 255, 255, 8);
 			noStroke();
-			rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
-			rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
-			rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
-			rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
+			// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
 		}
 	}
 }

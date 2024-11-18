@@ -20,6 +20,8 @@ class Tile {
 		this.bevelSW = false;
 		this.bevelNW = false;
 
+		this.rendered = false;
+
 	}
 
 	computeBevel() {
@@ -35,6 +37,10 @@ class Tile {
 
 	render() {
 		// Do nothing
+	}
+
+	getLight() {
+		return this.light;
 	}
 
 	avoidOnPathfinding() {
@@ -90,6 +96,40 @@ class Tile {
 		// Do nothing
 	}
 
+	drawDefaultBackground() {
+		let f = gameState.currentFloor();
+		let colors = [
+			[ f.getColor(this.x - 1, this.y - 1), 
+				f.getColor(this.x, this.y - 1),
+				f.getColor(this.x + 1, this.y - 1)
+			],
+			[ f.getColor(this.x - 1, this.y),
+				f.getColor(this.x, this.y),
+				f.getColor(this.x + 1, this.y)
+			],
+			[ f.getColor(this.x - 1, this.y + 1),
+				f.getColor(this.x, this.y + 1),
+				f.getColor(this.x + 1, this.y + 1)
+			]
+		];
+		let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
+								lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
+								lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
+								lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
+		];
+
+		beginShape(TESS);
+		fill(cornerColors[0]);
+		noStroke();
+		vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+		fill(cornerColors[1]);
+		vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+		fill(cornerColors[3]);
+		vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		fill(cornerColors[2]);
+		vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		endShape(CLOSE);
+	}
 
 }
 
@@ -154,8 +194,11 @@ class FloorPlan {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
 			return color(0, 0, 0);
 		}
-		let l = this.get(x, y).light;
-		return color(0.5 * l[0], 0.5 * l[1], 0.5 * l[2]);
+		if (!this.get(x, y).visible) {
+			return color(0, 0, 0);
+		}
+		let l = this.get(x, y).getLight();
+		return color(0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor);
 	}
 
 	updateFlicker() {
@@ -218,8 +261,8 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.001) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, color(Math.random() * 255, Math.random() * 255, Math.random() * 255));
+						if (Math.random() < 0.002) {
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 255, Math.random() * 255, Math.random() * 255]);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
@@ -568,13 +611,11 @@ class Wall extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
+			// this.drawDefaultBackground();
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			let c = color(Math.min(128, this.light[0] * 0.5), Math.min(128, this.light[1] * 0.5), Math.min(128, this.light[2] * 0.5));
-			fill(c);
-			noStroke();
-			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			this.drawDefaultBackground();
 			fill(this.light);
 			stroke(this.light);
 		}
@@ -635,48 +676,15 @@ class Floor extends Tile {
 				text('/', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 			} 
 		} else if (this.hasBeenSeen && !this.visible) {
+			//this.drawDefaultBackground();
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			// let f = gameState.currentFloor();
-			// let colors = [
-			// 	[ f.getColor(this.x - 1, this.y - 1), 
-			// 	  f.getColor(this.x, this.y - 1),
-			// 	  f.getColor(this.x + 1, this.y - 1)
-			// 	],
-			// 	[ f.getColor(this.x - 1, this.y),
-			// 	  f.getColor(this.x, this.y),
-			// 	  f.getColor(this.x + 1, this.y)
-			// 	],
-			// 	[ f.getColor(this.x - 1, this.y + 1),
-			// 	  f.getColor(this.x, this.y + 1),
-			// 	  f.getColor(this.x + 1, this.y + 1)
-			// 	]
-			// ];
-			// let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
-			// 					 lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
-			// 					 lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
-			// 					 lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
-			// ];
+			this.drawDefaultBackground();
 
-			// beginShape(TESS);
-			// fill(cornerColors[0]);
-			// noStroke();
-			// vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-			// fill(cornerColors[1]);
-			// vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
-			// fill(cornerColors[3]);
-			// vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
-			// fill(cornerColors[2]);
-			// vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
-			// endShape(CLOSE);
-
-			let c = color(Math.min(128, this.light[0] * 0.5 + globalFlickerFactor), Math.min(128, this.light[1] * 0.5 + globalFlickerFactor), Math.min(128, this.light[2] * 0.5 + globalFlickerFactor));
+			let c = color(this.light[0], this.light[1], this.light[2]);
 			fill(c);
-			noStroke();
-			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-			fill(this.light);
-			stroke(this.light);
+			stroke(c);
 		}
 		text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 	}
@@ -733,13 +741,12 @@ class Lamp extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
+			// this.drawDefaultBackground();
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
 		} else {
-			let c = color(Math.min(128, this.light[0] * 0.5), Math.min(128, this.light[1] * 0.5), Math.min(128, this.light[2] * 0.5));
-			fill(c);
-			noStroke();
-			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			this.drawDefaultBackground();
+
 			fill(this.light);
 			stroke(this.light);
 		}
@@ -856,7 +863,7 @@ class Water extends Tile {
 	constructor(x, y, depth) {
 		super(x, y);
 		this.depth = depth;
-		this.color = color(0, 0, 128);
+		this.color = [0, 0, 128];
 		this.lightSource = new LightSource(this.color, 0.1);
 	}
 
@@ -868,9 +875,11 @@ class Water extends Tile {
 	render() {
 		// this.lightSource.updateFlickerFactor();
 		let c = color(this.light[0], this.light[1], this.light[2]);
-		let useColor = lerpColor(this.lightSource.getLight(), c, 0.5);
-		fill(useColor);
-		stroke(useColor);
+		let ls = this.lightSource.getLight();
+		let lsc = color(ls[0], ls[1], ls[2]);
+		// let useColor = lerpColor(lsc, c, 0.5);
+		// fill(useColor);
+		// stroke(useColor);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
 			fill(255);
 			stroke(255);
@@ -878,14 +887,50 @@ class Water extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
+			// this.drawDefaultBackground();
 			fill(MEMORY_LIGHT);
 			noStroke();
+		} else {
+			this.drawDefaultBackground();
+			// let f = gameState.currentFloor();
+			// let colors = [
+			// 	[ f.getColor(this.x - 1, this.y - 1), 
+			// 		f.getColor(this.x, this.y - 1),
+			// 		f.getColor(this.x + 1, this.y - 1)
+			// 	],
+			// 	[ f.getColor(this.x - 1, this.y),
+			// 		f.getColor(this.x, this.y),
+			// 		f.getColor(this.x + 1, this.y)
+			// 	],
+			// 	[ f.getColor(this.x - 1, this.y + 1),
+			// 		f.getColor(this.x, this.y + 1),
+			// 		f.getColor(this.x + 1, this.y + 1)
+			// 	]
+			// ];
+			// let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
+			// 						lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
+			// 						lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
+			// 						lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
+			// ];
+	
+			// let blue = color(0, 0, 128);
+			// beginShape(TESS);
+			// fill(lerpColor(cornerColors[0], blue, 0.2));
+			// noStroke();
+			// vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			// fill(lerpColor(cornerColors[1], blue, 0.2));
+			// vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			// fill(lerpColor(cornerColors[3], blue, 0.2));
+			// vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			// fill(lerpColor(cornerColors[2], blue, 0.2));
+			// vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			// endShape(CLOSE);
 		}
-		if (this.visible) {
-			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-		}
+		// if (this.visible) {
+		// 	rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+		// }
 
-		let tildeColor = lerpColor(this.lightSource.getLight(), color(0, 0, 64), 0.75);
+		let tildeColor = lerpColor(lsc, color(0, 0, 64), 0.75);
 		fill(tildeColor);
 		stroke(tildeColor);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
@@ -903,6 +948,16 @@ class Water extends Tile {
 
 	updateFlickerFactor() {
 		this.lightSource.updateFlickerFactor();
+	}
+
+	// getLight() {
+	// 	return [128, 64, 0];
+	// }
+
+	getLight() {
+		let l = this.light.map(x => x * this.lightSource.flickerFactor);
+		l[2] += 128;
+		return l;
 	}
 
 	isEnterable() {
@@ -946,7 +1001,7 @@ class Lava extends Tile {
 
 	constructor(x, y) {
 		super(x, y);
-		this.color = color(255, 0, 0);
+		this.color = [48, 0, 0];
 		this.lightSource = new LightSource(this.color, 0.2);
 	}
 
@@ -968,12 +1023,46 @@ class Lava extends Tile {
 		} else if (this.hasBeenSeen && !this.visible) {
 			fill(MEMORY_LIGHT);
 			noStroke();
-		}
-		if (this.visible) {
-			rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-		}
+		} else {
+			let f = gameState.currentFloor();
+			let colors = [
+				[ f.getColor(this.x - 1, this.y - 1, true), 
+					f.getColor(this.x, this.y - 1, true),
+					f.getColor(this.x + 1, this.y - 1, true)
+				],
+				[ f.getColor(this.x - 1, this.y, true),
+					f.getColor(this.x, this.y, true),
+					f.getColor(this.x + 1, this.y, true)
+				],
+				[ f.getColor(this.x - 1, this.y + 1, true),
+					f.getColor(this.x, this.y + 1, true),
+					f.getColor(this.x + 1, this.y + 1, true)
+				]
+			];
+			let cornerColors = [ lerpColor(lerpColor(colors[0][0], colors[1][1], 0.5), lerpColor(colors[1][0], colors[0][1], 0.5), 0.5),
+									lerpColor(lerpColor(colors[0][1], colors[1][2], 0.5), lerpColor(colors[1][1], colors[0][2], 0.5), 0.5),
+									lerpColor(lerpColor(colors[1][0], colors[2][1], 0.5), lerpColor(colors[2][0], colors[1][1], 0.5), 0.5),
+									lerpColor(lerpColor(colors[1][1], colors[2][2], 0.5), lerpColor(colors[2][1], colors[1][2], 0.5), 0.5)
+			];
 
-		let caretColor = lerpColor(this.lightSource.getLight(), color(64, 0, 0), 0.75);
+			beginShape(TESS);
+			fill(cornerColors[0]);
+			noStroke();
+			vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			fill(cornerColors[1]);
+			vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			fill(cornerColors[3]);
+			vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			fill(cornerColors[2]);
+			vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			endShape(CLOSE);
+		}
+		// if (this.visible) {
+		// 	rect(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+		// }
+		let l = this.lightSource.getLight();
+		let c = color(l[0], l[1], l[2]);
+		let caretColor = lerpColor(c, color(64, 0, 0), 0.75);
 		fill(caretColor);
 		stroke(caretColor);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
@@ -999,7 +1088,7 @@ class Lava extends Tile {
 	}
 
 	getLight() {
-		return this.lightSource.getLight();
+		return this.light.map(x => x * this.lightSource.flickerFactor);
 	}
 
 	isEnterable() {

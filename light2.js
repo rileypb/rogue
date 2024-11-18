@@ -31,7 +31,7 @@ class LightSource {
 	}	
 
 	getLight() {
-		return color(this.color._getRed() * this.flickerFactor, this.color._getGreen() * this.flickerFactor, this.color._getBlue() * this.flickerFactor);
+		return [this.color[0] * this.flickerFactor, this.color[1] * this.flickerFactor, this.color[2] * this.flickerFactor];
 	}
 
 }
@@ -150,9 +150,9 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 			}	
 			if (lightSource.hasLineOfSight[x + y * MAP_WIDTH]) {
 				let light = lightSource.color;
-				let r = light._getRed();
-				let g = light._getGreen();
-				let b = light._getBlue();
+				let r = light[0];
+				let g = light[1];
+				let b = light[2];
 				lightSource.cache[x + y * MAP_WIDTH] = [r * fallOffValues[distance], g * fallOffValues[distance], b * fallOffValues[distance]];
 				let tile = floorplan.get(x, y);
 				tile.light[0] += r * fallOffValues[distance];
