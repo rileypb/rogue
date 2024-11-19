@@ -1,7 +1,7 @@
 const LIGHT_FALL_OFF = 0.88;
-const LIGHT_THRESHOLD = 0.3;
+const LIGHT_THRESHOLD = 20;
 const MAX_LIGHT_DISTANCE = 20;
-const MEMORY_LIGHT = 40;
+const MEMORY_LIGHT = [40, 40, 80];
 
 let globalFlickerFactor = 0;
 

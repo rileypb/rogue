@@ -1,6 +1,8 @@
 
+BACKGROUND_COLOR = [20, 20, 40];
+
 function render() {
-	background(0);
+	background(BACKGROUND_COLOR);
 	resetMatrix();
 	// translate(-drawLeft, -drawTop);
 	translate(-drawLeft-CANVAS_WIDTH/2, -drawTop-CANVAS_HEIGHT/2);	
@@ -37,30 +39,26 @@ function drawFloorPlan() {
 				}
 			}
 		}
-		if (!tile.visible){
-			fill(128, 128, 255, 16);
-			noStroke();
-			// rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
-			fill(255, 255, 255, 8);
-			noStroke();
-			// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
-			// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
-			// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
-			// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
-		}
+		// if (!tile.visible){
+		// 	fill(128, 128, 255, 16);
+		// 	noStroke();
+		// 	rect(tile.x * GRID_SIZE_X, tile.y * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+		// 	fill(255, 255, 255, 8);
+		// 	noStroke();
+		// 	// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
+		// 	// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
+		// 	// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
+		// 	// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
+		// }
 	}
 }
-
-let pulse = 0;
-let pulseDirection = 1;
-const PULSE_MAGNITUDE = 5;
 
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
 	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
 	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
-	if (autoMoveTask.autoMoveInProgress && path.length > 0) {
+	if (autoMoveTask.autoMoveInProgress && path && path.length > 0) {
 		x = path[0].x;
 		y = path[0].y;
 	}

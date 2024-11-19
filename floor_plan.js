@@ -204,10 +204,10 @@ class FloorPlan {
 
 	getColor(x, y) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-			return [0, 0, 0];
+			return [0,0,0];
 		}
 		if (!this.get(x, y).visible) {
-			return [0, 0, 0];
+			return [0,0,0];
 		}
 		let l = this.get(x, y).getLight();
 		return [0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor];
@@ -274,7 +274,7 @@ class FloorPlan {
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
 						if (Math.random() < 0.002) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 64, Math.random() * 64, Math.random() * 64]);
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 128, Math.random() * 128, Math.random() * 128]);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
@@ -634,7 +634,8 @@ class Wall extends Tile {
 			stroke(this.light);
 		}
 		let char = '#';
-		if (!asNeighbor) {
+		// if (!asNeighbor) {
+		if (this.hasBeenSeen) {
 			text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		}
 	}
