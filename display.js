@@ -17,6 +17,7 @@ function drawFloorPlan() {
 	for (let tile of floorPlan) {
 		tile.rendered = false;
 	}
+	allRenderedNeighbors = [];
 	for (let tile of floorPlan) {
 		if (tile.visible || ((RENDER_MODE == LINE_OF_SIGHT || RENDER_MODE == LINE_OF_SIGHT_PLUS) && tile.hasLineOfSight) || tile.hasBeenSeen) {
 			tile.render();
@@ -35,10 +36,63 @@ function drawFloorPlan() {
 					if (!t.rendered) {
 						t.render(true);
 						t.rendered = true;
+						allRenderedNeighbors.push(t);
 					}
 				}
 			}
 		}
+	}
+	for (let t of allRenderedNeighbors) {
+		let neighbors = gameState.currentFloor().getNeighbors(t.x, t.y);
+		for (let neighbor of neighbors) {
+			let tt = gameState.currentFloor().get(neighbor.x, neighbor.y);
+			if (!tt.visible && !tt.rendered) {
+				let moreNeighbors = gameState.currentFloor().getNeighbors(tt.x, tt.y);
+				let cornerColors = [BACKGROUND_COLOR, BACKGROUND_COLOR, BACKGROUND_COLOR, BACKGROUND_COLOR];
+				let black = [0, 0, 0];
+				for (let n of moreNeighbors) {
+					let ttt = gameState.currentFloor().get(n.x, n.y);
+					if (!ttt.visible && ttt.rendered) {
+						let dx = ttt.x - tt.x;
+						let dy = ttt.y - tt.y;
+						if (dx == -1 && dy == -1) {
+							cornerColors[0] = black;
+						} else if (dx == 0 && dy == -1) {
+							cornerColors[0] = black;
+							cornerColors[1] = black;
+						} else if (dx == 1 && dy == -1) {
+							cornerColors[1] = black;
+						} else if (dx == -1 && dy == 0) {
+							cornerColors[0] = black;
+							cornerColors[3] = black;
+						} else if (dx == 1 && dy == 0) {
+							cornerColors[1] = black;
+							cornerColors[2] = black;
+						} else if (dx == -1 && dy == 1) {
+							cornerColors[3] = black;
+						} else if (dx == 0 && dy == 1) {
+							cornerColors[2] = black;
+							cornerColors[3] = black;
+						} else if (dx == 1 && dy == 1) {
+							cornerColors[2] = black;
+						}
+					}
+				}
+
+				beginShape(TESS);
+				fill(cornerColors[0]);
+				noStroke();
+				vertex(tt.x * GRID_SIZE_X, tt.y * GRID_SIZE_Y);
+				fill(cornerColors[1]);
+				vertex((tt.x + 1) * GRID_SIZE_X, tt.y * GRID_SIZE_Y);
+				fill(cornerColors[2]);
+				vertex((tt.x + 1) * GRID_SIZE_X, (tt.y + 1) * GRID_SIZE_Y);
+				fill(cornerColors[3]);
+				vertex(tt.x * GRID_SIZE_X, (tt.y + 1) * GRID_SIZE_Y);
+				endShape(CLOSE);
+			}
+		}
+	}
 		// if (!tile.visible){
 		// 	fill(128, 128, 255, 16);
 		// 	noStroke();
@@ -50,8 +104,8 @@ function drawFloorPlan() {
 		// 	// rect(tile.x * GRID_SIZE_X + 4, tile.y * GRID_SIZE_Y - 4, GRID_SIZE_X, GRID_SIZE_Y);
 		// 	// rect(tile.x * GRID_SIZE_X - 4, tile.y * GRID_SIZE_Y + 4, GRID_SIZE_X, GRID_SIZE_Y);
 		// }
-	}
 }
+
 
 function drawCursor() {
 	fill(255, 255, 255, 64);

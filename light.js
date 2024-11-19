@@ -28,7 +28,7 @@ function updateLight(floorplan, player) {
 	// reset light
 	for (let tile of floorplan.tiles) {
 		if (tile) {
-			tile.light = color(0, 0, 0);
+			tile.light = [0, 0, 0];
 		}
 	}
 	// cast player's torchlight
