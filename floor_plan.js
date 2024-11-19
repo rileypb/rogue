@@ -608,7 +608,7 @@ class Wall extends Tile {
 		return true;
 	}
 
-	render(asNeighbor=false) {
+	render(asNeighbor=false, symbol_only=false) {
 		let resultingLight = this.light;
 		if (this.kind == this.WOOD) {
 			resultingLight = color(139, 69, 19);
@@ -623,12 +623,12 @@ class Wall extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			if (asNeighbor) {
+			if (asNeighbor && !symbol_only) {
 				this.drawDefaultBackground();
 			}
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
-		} else {
+		} else if (!symbol_only) {
 			this.drawDefaultBackground();
 			fill(this.light);
 			stroke(this.light);
@@ -670,7 +670,7 @@ class Floor extends Tile {
 		super(x, y);
 	}
 
-	render(asNeighbor=false) {
+	render(asNeighbor=false, symbol_only=false) {
 		fill(this.light);
 		stroke(this.light);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
@@ -693,19 +693,19 @@ class Floor extends Tile {
 				text('/', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 			} 
 		} else if (this.hasBeenSeen && !this.visible) {
-			if (asNeighbor) {
+			if (asNeighbor && !symbol_only) {
 				this.drawDefaultBackground();
 			}
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
-		} else {
+		} else if (!symbol_only) {
 			this.drawDefaultBackground();
 
 			let c = color(this.light[0], this.light[1], this.light[2]);
 			fill(c);
 			stroke(c);
 		}
-		if (!asNeighbor) {
+		if (!asNeighbor && this.hasBeenSeen) {
 			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		}
 	}
@@ -751,7 +751,7 @@ class Lamp extends Tile {
 		return false;
 	}
 
-	render(asNeighbor=false) {
+	render(asNeighbor=false, symbol_only=false) {
 		this.updateFlickerFactor();
 		fill(this.getLight());
 		stroke(this.getLight());
@@ -762,18 +762,18 @@ class Lamp extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			if (asNeighbor) {
+			if (asNeighbor && !symbol_only) {
 				this.drawDefaultBackground();
 			}
 			fill(MEMORY_LIGHT);
 			stroke(MEMORY_LIGHT);
-		} else {
+		} else if (!symbol_only) {
 			this.drawDefaultBackground();
 
 			fill(this.light);
 			stroke(this.light);
 		}
-		if (!asNeighbor) {
+		if (!asNeighbor && this.hasBeenSeen) {
 			text('o', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		}
 	}
@@ -897,7 +897,7 @@ class Water extends Tile {
 	}
 
 
-	render(asNeighbor=false) {
+	render(asNeighbor=false, symbol_only=false) {
 		// this.lightSource.updateFlickerFactor();
 		let c = color(this.light[0], this.light[1], this.light[2]);
 		let ls = this.lightSource.getLight();
@@ -912,12 +912,12 @@ class Water extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			if (asNeighbor) {
+			if (asNeighbor && !symbol_only) {
 				this.drawDefaultBackground();
 			}
 			fill(MEMORY_LIGHT);
 			noStroke();
-		} else {
+		} else if (!symbol_only) {
 			this.drawDefaultBackground();
 			// let f = gameState.currentFloor();
 			// let colors = [
@@ -1037,7 +1037,7 @@ class Lava extends Tile {
 	}
 
 
-	render(asNeighbor=false) {
+	render(asNeighbor=false, symbol_only=false) {
 		// this.updateFlickerFactor();
 		fill(this.getLight());
 		stroke(this.getLight());
@@ -1048,7 +1048,7 @@ class Lava extends Tile {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (this.hasBeenSeen && !this.visible) {
-			if (asNeighbor) {
+			if (asNeighbor && !symbol_only) {
 				let f = gameState.currentFloor();
 				let colors = [
 					[ f.getColor(this.x - 1, this.y - 1, true), 
@@ -1090,7 +1090,7 @@ class Lava extends Tile {
 			}
 			fill(MEMORY_LIGHT);
 			noStroke();
-		} else {
+		} else if (!symbol_only) {
 			let f = gameState.currentFloor();
 			let colors = [
 				[ f.getColor(this.x - 1, this.y - 1, true), 

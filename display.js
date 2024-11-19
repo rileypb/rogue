@@ -90,6 +90,7 @@ function drawFloorPlan() {
 				fill(cornerColors[3]);
 				vertex(tt.x * GRID_SIZE_X, (tt.y + 1) * GRID_SIZE_Y);
 				endShape(CLOSE);
+				tt.render(false, true);
 			}
 		}
 	}
