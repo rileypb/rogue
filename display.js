@@ -5,7 +5,7 @@ function render() {
 	background(BACKGROUND_COLOR);
 	resetMatrix();
 	// translate(-drawLeft, -drawTop);
-	translate(-drawLeft-CANVAS_WIDTH/2, -drawTop-CANVAS_HEIGHT/2);	
+	translate(-drawLeft-CANVAS_WIDTH/2 + shiftX, -drawTop-CANVAS_HEIGHT/2 + shiftY);	
 	drawFloorPlan();
 	drawEnemies();
 	drawPlayer();
@@ -111,11 +111,19 @@ function drawFloorPlan() {
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
-	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
-	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
+	let x = Math.floor((mouseX + drawLeft - shiftX) / GRID_SIZE_X);
+	let y = Math.floor((mouseY + drawTop - shiftY) / GRID_SIZE_Y);
 	if (autoMoveTask.autoMoveInProgress && path && path.length > 0) {
 		x = path[0].x;
 		y = path[0].y;
+		shiftX *= 0.9;
+		shiftY *= 0.9;
+		if (Math.abs(shiftX) < 1) {
+			shiftX = 0;
+		}
+		if (Math.abs(shiftY) < 1) {
+			shiftY = 0;
+		}
 	}
 	let localPath = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 	if (localPath) {

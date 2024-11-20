@@ -49,16 +49,22 @@ let autoMoveInProgress = false;
 let robotoMono;
 let b612Mono;
 
+let myCanvas;
+
 function preload() {
 	robotoMono = loadFont("RobotoMono-Regular.ttf");
 	b612Mono = loadFont("B612Mono-Regular.ttf");
 }
 
 function setup() {
-	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
-	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
+	let sketchHolder = document.getElementById('sketch-holder');
+	let holderWidth = sketchHolder.clientWidth;
+	let holderHeight = windowHeight;
+	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderWidth);
+	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, holderHeight);
 
-	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
+	myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
+	myCanvas.parent('sketch-holder');
 	cursor(CROSS);
 	textFont(b612Mono, GRID_SIZE_Y);
 
@@ -76,6 +82,36 @@ function setup() {
 	updateLight(gameState.currentFloor(), gameState.player);
 	gameState.player.calculateSight(gameState.currentFloor());
 	render();
+
+	sketchHolder.addEventListener('wheel', function(event) {
+		// translate(-drawLeft-CANVAS_WIDTH/2 + shiftX, -drawTop-CANVAS_HEIGHT/2 + shiftY);
+		event.preventDefault();
+		shiftX += event.deltaX/5;
+		console.log(shiftX, drawLeft, drawRight, MAP_PIXEL_WIDTH	);
+		if (-shiftX + drawLeft < 0) {
+			shiftX = drawLeft;
+		}
+		if (-shiftX + drawRight > MAP_PIXEL_WIDTH) {
+			shiftX = -MAP_PIXEL_WIDTH + drawRight;
+		}
+		shiftY += event.deltaY;
+		if (-shiftY + drawTop < 0) {
+			shiftY = drawTop;
+		}
+		if (-shiftY + drawBottom > MAP_PIXEL_HEIGHT) {
+			shiftY = -MAP_PIXEL_HEIGHT + drawBottom;
+		}
+		render();
+	});
+}
+
+function windowResized() {
+	let sketchHolder = document.getElementById('sketch-holder');
+	let holderWidth = sketchHolder.clientWidth;
+	let holderHeight = window.innerHeight;
+	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderWidth);
+	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, holderHeight);
+	resizeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 function setupGameState(gameState) {
