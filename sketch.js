@@ -65,6 +65,7 @@ function setup() {
 
 	myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
 	myCanvas.parent('sketch-holder');
+	sizeCanvas();
 	cursor(CROSS);
 	textFont(b612Mono, GRID_SIZE_Y);
 
@@ -112,6 +113,17 @@ function windowResized() {
 	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderWidth);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, holderHeight);
 	resizeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+}
+
+function sizeCanvas() {
+	let minDimension = Math.min(windowWidth, windowHeight);
+	CANVAS_WIDTH = minDimension;
+	CANVAS_HEIGHT = minDimension;
+	resizeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+}
+
+function windowResized() {
+	sizeCanvas();
 }
 
 function setupGameState(gameState) {
