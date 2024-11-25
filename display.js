@@ -1,6 +1,9 @@
 
 BACKGROUND_COLOR = [20, 20, 40];
 
+let offsetX = 0;
+let offsetY = 0;
+
 function render() {
 	background(BACKGROUND_COLOR);
 	resetMatrix();
