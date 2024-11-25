@@ -1,5 +1,5 @@
 const LIGHT_FALL_OFF = 0.85;
-const LIGHT_THRESHOLD = 30;
+const LIGHT_THRESHOLD = 150;
 const MAX_LIGHT_DISTANCE = 20;
 const MEMORY_LIGHT = [50, 50, 90];
 

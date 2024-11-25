@@ -87,7 +87,7 @@ function setup() {
 	sketchHolder.addEventListener('wheel', function(event) {
 		// translate(-drawLeft-CANVAS_WIDTH/2 + shiftX, -drawTop-CANVAS_HEIGHT/2 + shiftY);
 		event.preventDefault();
-		shiftX += event.deltaX/5;
+		shiftX += -event.deltaX/5;
 		console.log(shiftX, drawLeft, drawRight, MAP_PIXEL_WIDTH	);
 		if (-shiftX + drawLeft < 0) {
 			shiftX = drawLeft;
