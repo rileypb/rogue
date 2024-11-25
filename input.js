@@ -1,3 +1,6 @@
+let shiftX = 0;
+let shiftY = 0;
+
 class InputTask extends Task {
 	INITIAL_DELAY = 30;
 	DELAY = 8;
@@ -72,13 +75,18 @@ function touchEnded() {
 				autoMoveTask.autoMoveInProgress = true;
 			}
 		}
+	} else if (touchesCache.length == 2) {
+		// let x1 = touchesCache[0].x;
+		// let y1 = touchesCache[0].y;
+		// let x2 = touchesCache[1].x;
+		// let y2 = touchesCache[1].y;
 	}
 	touchesCache = [];
 }
 
 function mouseReleased() {
-	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
-	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
+	let x = Math.floor((mouseX + drawLeft - shiftX) / GRID_SIZE_X);
+	let y = Math.floor((mouseY + drawTop - shiftY) / GRID_SIZE_Y);
 	let targetTile = gameState.currentFloor().get(x, y);
 	if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
 		return;
