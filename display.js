@@ -140,35 +140,35 @@ function drawCursor() {
 			let dy = nextTile.y - tile.y;
 			if (dx == 1 && dy == 0) {
 				// fill(0);
-				text('→', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('→', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == -1 && dy == 0) {
 				// fill(0);
-				text('←', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('←', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == 0 && dy == 1) {
 				// fill(0);
-				text('↓', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↓', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == 0 && dy == -1) {
 				// fill(0);
-				text('↑', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↑', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == 1 && dy == 1) {
 				// fill(0);
-				text('↘', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↘', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == -1 && dy == 1) {
 				// fill(0);
-				text('↙', (tile.x + 0.25) * GRID_SIZE_X, (tile.y +0.75) * GRID_SIZE_Y);
+				text('↙', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == 1 && dy == -1) {
 				// fill(0);
-				text('↗', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↗', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			} else if (dx == -1 && dy == -1) {
 				// fill(0);
-				text('↖', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↖', (tile.x + 0.05) * GRID_SIZE_X, (tile.y + 1) * GRID_SIZE_Y);
 			}
 		}
 		if (localPath.length > 0) {
 			fill(255, 255, 255, 128);
-			ellipse((localPath[0].x+0.5) * GRID_SIZE_X, (localPath[0].y+0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			ellipse((localPath[0].x+0.35) * GRID_SIZE_X, (localPath[0].y+0.75) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(0);
-			text('⌖', (localPath[0].x + 0) * GRID_SIZE_X, (localPath[0].y + 0.75) * GRID_SIZE_Y);
+			text('X', (localPath[0].x + 0) * GRID_SIZE_X, (localPath[0].y + 1.1) * GRID_SIZE_Y);
 		}
 	} else {
 		fill(255, 0, 0, 128);
@@ -184,7 +184,7 @@ function drawCursor() {
 function drawPlayer() {
 	fill(255);
 	stroke(255);
-	text('@', gameState.player.x * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y);
+	text('@', (gameState.player.x + 0.05) * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y);
 }
 
 function drawEnemies() {

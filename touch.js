@@ -3,20 +3,24 @@ let isDragging = false;
 
 function touchStarted(event) {
 	event.preventDefault();
-	startX = event.touches[0].pageX;
-	startY = event.touches[0].pageY;
+	if (event.touches) {
+		startX = event.touches[0].pageX;
+		startY = event.touches[0].pageY;
+	}
 }
 
 function touchMoved(event) {
-	isDragging = true;
-	event.preventDefault();
-	let dx = event.touches[0].pageX - startX;
-	let dy =event.touches[0].pageY - startY;
-	shiftX += dx;
-	shiftY += dy;
-	startX = event.touches[0].pageX;
-	startY = event.touches[0].pageY;
-	return false; // prevent default
+	if (event.touches) {
+		isDragging = true;
+		event.preventDefault();
+		let dx = event.touches[0].pageX - startX;
+		let dy =event.touches[0].pageY - startY;
+		shiftX += dx;
+		shiftY += dy;
+		startX = event.touches[0].pageX;
+		startY = event.touches[0].pageY;
+		return false; // prevent default
+	}
 }
 
 function touchEnded(event) {
