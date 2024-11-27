@@ -304,8 +304,21 @@ class FloorPlan {
 			let yPow = Math.floor(Math.random() * 3) + 2;
 			let materialIndex = Math.floor(Math.random() * 5);
 
-			if (this.tiles[x + y * this.width] instanceof Floor) {
-				materialIndex = this.tiles[x + y * this.width].material;
+			let materialChanged = false;
+			for (let xx = x - 1; xx < x + 1; xx++) {
+				for (let yy = y - 1; yy < y + 1; yy++) {
+					if (xx < 1 || xx >= this.width - 1 || yy < 1 || yy >= this.height - 1) {
+						continue;
+					}
+					if (this.tiles[x + y * this.width] instanceof Floor) {
+						materialIndex = this.tiles[x + y * this.width].material;
+						materialChanged = true;
+						break;
+					}
+				}
+				if (materialChanged) {
+					break;
+				}
 			}
 			for (let xx = x - dx; xx < x + dx; xx++) {
 				for (let yy = y - dy; yy < y + dy; yy++) {
