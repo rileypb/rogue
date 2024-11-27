@@ -220,9 +220,18 @@ class FloorPlan {
 		if (this.get(x, y) instanceof Lava) {
 			return this.getColor2(x, y);
 		}
-		let l = this.get(x, y).getLight();
-		let c = this.get(x, y).getBaseColor();
-		return [0.5 * l[0] + globalFlickerFactor + 0.5 * c[0], 0.5 * l[1] + globalFlickerFactor + 0.5 * c[1], 0.5 * l[2] + globalFlickerFactor + 0.5 * c[2]];
+
+		let l = color(this.get(x, y).getLight());
+		let c = color(this.get(x, y).getBaseColor());
+		colorMode(HSB);
+		let brightness = l._getBrightness() + globalFlickerFactor;
+		let baseBrightness = c._getBrightness();
+		let totalBrightness = brightness + baseBrightness;
+		let hue = (baseBrightness/totalBrightness * c._getHue() + brightness/totalBrightness * l._getHue()) % 360;
+		let saturation = (l._getSaturation() + c._getSaturation()) / 2;
+		let final = color(hue, saturation, brightness);
+		colorMode(RGB);
+		return [final._getRed(), final._getGreen(), final._getBlue()];
 	}
 
 	getColor2(x, y) {
@@ -289,7 +298,7 @@ class FloorPlan {
 			if (dy > ySpace) {
 				dy = ySpace - 1;
 			}
-			let isLava = Math.random() < 0.3;
+			let isLava = Math.random() < 0.03;
 			let isWater = Math.random() < 0.03;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
@@ -304,7 +313,7 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.002) {
+						if (Math.random() < 0.000) {
 							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 128, Math.random() * 128, Math.random() * 128]);
 						} else {
 							if (isLava) {
@@ -1055,7 +1064,7 @@ class Water extends Tile {
 
 	getLight() {
 		let l = this.light.map(x => x * this.lightSource.flickerFactor);
-		l[2] += 128;
+		l[2] *= 3;
 		return l;
 	}
 
@@ -1101,7 +1110,7 @@ class Lava extends Tile {
 	constructor(x, y) {
 		super(x, y);
 		this.color = [512, 0, 0];
-		this.lightSource = new LightSource([16, 6, 6], 0.2);
+		this.lightSource = new LightSource([128, 0, 0], 0.2);
 	}
 
 	avoidOnPathfinding() {
