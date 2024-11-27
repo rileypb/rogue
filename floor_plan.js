@@ -1149,17 +1149,17 @@ class Lava extends Tile {
 			if (asNeighbor && !symbol_only) {
 				let f = gameState.currentFloor();
 				let colors = [
-					[ f.getColor2(this.x - 1, this.y - 1, true), 
-						f.getColor2(this.x, this.y - 1, true),
-						f.getColor2(this.x + 1, this.y - 1, true)
+					[ f.getColor(this.x - 1, this.y - 1, true), 
+						f.getColor(this.x, this.y - 1, true),
+						f.getColor(this.x + 1, this.y - 1, true)
 					],
-					[ f.getColor2(this.x - 1, this.y, true),
-						f.getColor2(this.x, this.y, true),
-						f.getColor2(this.x + 1, this.y, true)
+					[ f.getColor(this.x - 1, this.y, true),
+						f.getColor(this.x, this.y, true),
+						f.getColor(this.x + 1, this.y, true)
 					],
-					[ f.getColor2(this.x - 1, this.y + 1, true),
-						f.getColor2(this.x, this.y + 1, true),
-						f.getColor2(this.x + 1, this.y + 1, true)
+					[ f.getColor(this.x - 1, this.y + 1, true),
+						f.getColor(this.x, this.y + 1, true),
+						f.getColor(this.x + 1, this.y + 1, true)
 					]
 				];
 				let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
