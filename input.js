@@ -63,9 +63,9 @@ function touchEnded() {
 			let x = Math.floor((touch.x + drawLeft) / GRID_SIZE_X);
 			let y = Math.floor((touch.y + drawTop) / GRID_SIZE_Y);
 			let targetTile = gameState.currentFloor().get(x, y);
-			if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
-				return;
-			}
+			// if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
+			// 	return;
+			// }
 			path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 			if (!path) {
 				return;
