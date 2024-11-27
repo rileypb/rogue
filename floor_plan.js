@@ -217,6 +217,9 @@ class FloorPlan {
 		if (!this.get(x, y).visible) {
 			return [0,0,0];
 		}
+		if (this.get(x, y) instanceof Lava) {
+			return this.getColor2(x, y);
+		}
 		let l = this.get(x, y).getLight();
 		let c = this.get(x, y).getBaseColor();
 		return [0.5 * l[0] + globalFlickerFactor + 0.5 * c[0], 0.5 * l[1] + globalFlickerFactor + 0.5 * c[1], 0.5 * l[2] + globalFlickerFactor + 0.5 * c[2]];
@@ -228,6 +231,9 @@ class FloorPlan {
 		}
 		if (!this.get(x, y).visible) {
 			return [0,0,0];
+		}
+		if (!this.get(x, y) instanceof Lava) {
+			return this.getColor(x, y);
 		}
 		let l = this.get(x, y).getLight();
 		return [0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor];
@@ -283,7 +289,7 @@ class FloorPlan {
 			if (dy > ySpace) {
 				dy = ySpace - 1;
 			}
-			let isLava = Math.random() < 0.03;
+			let isLava = Math.random() < 0.3;
 			let isWater = Math.random() < 0.03;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
@@ -1095,7 +1101,7 @@ class Lava extends Tile {
 	constructor(x, y) {
 		super(x, y);
 		this.color = [512, 0, 0];
-		this.lightSource = new LightSource([32, 0, 0], 0.2);
+		this.lightSource = new LightSource([16, 6, 6], 0.2);
 	}
 
 	avoidOnPathfinding() {
@@ -1159,23 +1165,23 @@ class Lava extends Tile {
 		} else if (!symbol_only) {
 			let f = gameState.currentFloor();
 			let colors = [
-				[ f.getColor2(this.x - 1, this.y - 1, true), 
-					f.getColor2(this.x, this.y - 1, true),
-					f.getColor2(this.x + 1, this.y - 1, true)
+				[ f.getColor(this.x - 1, this.y - 1, true), 
+					f.getColor(this.x, this.y - 1, true),
+					f.getColor(this.x + 1, this.y - 1, true)
 				],
-				[ f.getColor2(this.x - 1, this.y, true),
-					f.getColor2(this.x, this.y, true),
-					f.getColor2(this.x + 1, this.y, true)
+				[ f.getColor(this.x - 1, this.y, true),
+					f.getColor(this.x, this.y, true),
+					f.getColor(this.x + 1, this.y, true)
 				],
-				[ f.getColor2(this.x - 1, this.y + 1, true),
-					f.getColor2(this.x, this.y + 1, true),
-					f.getColor2(this.x + 1, this.y + 1, true)
+				[ f.getColor(this.x - 1, this.y + 1, true),
+					f.getColor(this.x, this.y + 1, true),
+					f.getColor(this.x + 1, this.y + 1, true)
 				]
 			];
 			let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
-			lerpArray(lerpArray(colors[0][1], colors[1][2], 0.5), lerpArray(colors[1][1], colors[0][2], 0.5), 0.5),
-			lerpArray(lerpArray(colors[1][0], colors[2][1], 0.5), lerpArray(colors[2][0], colors[1][1], 0.5), 0.5),
-			lerpArray(lerpArray(colors[1][1], colors[2][2], 0.5), lerpArray(colors[2][1], colors[1][2], 0.5), 0.5)
+									lerpArray(lerpArray(colors[0][1], colors[1][2], 0.5), lerpArray(colors[1][1], colors[0][2], 0.5), 0.5),
+									lerpArray(lerpArray(colors[1][0], colors[2][1], 0.5), lerpArray(colors[2][0], colors[1][1], 0.5), 0.5),
+									lerpArray(lerpArray(colors[1][1], colors[2][2], 0.5), lerpArray(colors[2][1], colors[1][2], 0.5), 0.5)
 			];
 
 			beginShape(TESS);
