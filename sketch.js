@@ -80,7 +80,7 @@ function setup() {
 	}
 	playerLightSource = new LightSource([192, 192, 192], 0.1);
 	gameState.player.calculateLineOfSight(gameState.currentFloor());
-	updateLight(gameState.currentFloor(), gameState.player);
+	updateLight(gameState.currentFloor(), gameState.player, true);
 	gameState.player.calculateSight(gameState.currentFloor());
 	render();
 

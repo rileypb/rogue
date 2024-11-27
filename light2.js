@@ -3,6 +3,8 @@ const LIGHT_THRESHOLD = 40;
 const MAX_LIGHT_DISTANCE = 20;
 const MEMORY_LIGHT = [50, 50, 90];
 
+const AMBIENT_LIGHT = [0,0,0]
+
 let globalFlickerFactor = 0;
 
 let fallOffValues = [];
@@ -50,6 +52,15 @@ function subtractLight(floorplan, lightSource) {
 
 function updateLight(floorplan, player, refreshAll = false) {
 	let allLightSources = [];
+
+	// if (refreshAll) {
+	// 	for (let tile of floorplan.tiles) {
+	// 		if (tile) {
+	// 			tile.light = AMBIENT_LIGHT;
+	// 		}
+	// 	}
+	// }
+
 	// cast player's torchlight
 	subtractLight(floorplan, playerLightSource);
 	updateLightFromPosition(floorplan, player.x, player.y, playerLightSource);

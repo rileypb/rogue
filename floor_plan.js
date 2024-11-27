@@ -160,6 +160,7 @@ class FloorPlan {
 	MIX = 2;
 	ONE_ROOM = 3;
 	RANDOM_WALLS = 4;
+	CASTLE = 5;
 
 	constructor(width, height, floor) {
 		this.width = width;
@@ -270,6 +271,9 @@ class FloorPlan {
 				break;
 			case this.RANDOM_WALLS:
 				this.generateRandomWalls();
+				break;
+			case this.CASTLE:
+				generateCastle(this);
 				break;
 		}
 		this.computeBevel();
@@ -566,16 +570,16 @@ class FloorPlan {
 				}
 			}
 		}
-		//create 5 random lamps
-		for (let i = 0; i < 5; i++) {
-			let x = Math.floor(Math.random() * this.width);
-			let y = Math.floor(Math.random() * this.height);
-			while (!this.get(x, y).isEnterable()) {
-				x = Math.floor(Math.random() * this.width);
-				y = Math.floor(Math.random() * this.height);
-			}
-			this.tiles[x + y * this.width] = new Lamp(x, y, color(Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)));
-		}
+		// //create 5 random lamps
+		// for (let i = 0; i < 5; i++) {
+		// 	let x = Math.floor(Math.random() * this.width);
+		// 	let y = Math.floor(Math.random() * this.height);
+		// 	while (!this.get(x, y).isEnterable()) {
+		// 		x = Math.floor(Math.random() * this.width);
+		// 		y = Math.floor(Math.random() * this.height);
+		// 	}
+		// 	this.tiles[x + y * this.width] = new Lamp(x, y, color(Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)));
+		// }
 
 		// add one irregularly shaped pool of lava of around 8 spaces
 		let x = Math.floor(Math.random() * this.width);
@@ -1123,7 +1127,7 @@ class Lava extends Tile {
 	constructor(x, y) {
 		super(x, y);
 		this.color = [512, 0, 0];
-		this.lightSource = new LightSource([128, 0, 0], 0.2);
+		this.lightSource = new LightSource([16, 16, 16], 0.2);
 	}
 
 	avoidOnPathfinding() {

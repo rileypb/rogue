@@ -1,5 +1,6 @@
 
 BACKGROUND_COLOR = [20, 20, 40];
+HORIZON = 100000;
 
 let offsetX = 0;
 let offsetY = 0;

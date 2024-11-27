@@ -117,7 +117,11 @@ class Player {
 
 	calculateSight(floorPlan) {
 		for (let tile of floorPlan.tiles) {
-			tile.visible = tile.hasLineOfSight && tile.hasSufficientLight();
+			let player = gameState.player;
+			let dx = player.x - tile.x;
+			let dy = player.y - tile.y;
+			let distance = dx ** 2 + dy ** 2;
+			tile.visible = (distance <= HORIZON) && tile.hasLineOfSight && tile.hasSufficientLight();
 			tile.hasBeenSeen = tile.hasBeenSeen || tile.visible;
 		}
 	}
