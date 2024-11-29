@@ -218,19 +218,23 @@ class FloorPlan {
 		if (!this.get(x, y).visible) {
 			return [0,0,0];
 		}
-		if (this.get(x, y) instanceof Lava) {
+		if (this.get(x, y) instanceof Lava || this.get(x, y) instanceof Water) {
 			return this.getColor2(x, y);
 		}
 
 		let l = color(this.get(x, y).getLight());
 		let c = color(this.get(x, y).getBaseColor());
+		let newColor = lerpColor(c, l, 0.5);
 		colorMode(HSB);
 		let brightness = l._getBrightness() + globalFlickerFactor;
 		let baseBrightness = c._getBrightness();
 		let totalBrightness = brightness + baseBrightness;
-		let hue = (baseBrightness/totalBrightness * c._getHue() + brightness/totalBrightness * l._getHue()) % 360;
-		let saturation = (l._getSaturation() + c._getSaturation()) / 2;
-		let final = color(hue, saturation, brightness);
+		let s1 = c._getSaturation();
+		let s2 = l._getSaturation();
+		let totalSaturation = s1 + s2;
+		let h = hue(newColor);
+		let s = (l._getSaturation() + c._getSaturation()) / 2;
+		let final = color(h, s, brightness);
 		colorMode(RGB);
 		return [final._getRed(), final._getGreen(), final._getBlue()];
 	}
@@ -242,7 +246,7 @@ class FloorPlan {
 		if (!this.get(x, y).visible) {
 			return [0,0,0];
 		}
-		if (!this.get(x, y) instanceof Lava) {
+		if (!this.get(x, y) instanceof Lava && !this.get(x, y) instanceof Water) {
 			return this.getColor(x, y);
 		}
 		let l = this.get(x, y).getLight();
@@ -330,8 +334,8 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.000) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 128, Math.random() * 128, Math.random() * 128]);
+						if (Math.random() < 0.02) {
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [150,150,255]);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
@@ -436,7 +440,7 @@ class FloorPlan {
 				// 		x++;
 				// 	}
 				// } else 
-				if (Math.random() < 0.1) {
+				if (Math.random() < 0.3) {
 					let selector = Math.random();
 					if (selector < 0.25 && this.get(x + 1, y)) {
 						x++;
@@ -752,7 +756,7 @@ FLOOR_MATERIAL_TILE = 4;
 FLOOR_MATERIAL_SAND = 5;
 
 class Floor extends Tile {
-	MATERIAL_COLORS = [ [0, 0, 0], [139, 69, 19], [0, 128, 0], [139, 69, 19], [192, 192, 192], [255, 255, 0] ];
+	MATERIAL_COLORS = [ [0, 0, 0], [139, 69, 19], [0, 255, 0], [139, 69, 19], [192, 192, 192], [255, 255, 0] ];
 	MATERIAL_SYMBOLS = [ ['.', '.'], ['=', '='], ['"', '"'], ['.', '.'], ['.', '.'], ['.', '.'] ];
 
 	constructor(x, y, material) {

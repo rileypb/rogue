@@ -89,6 +89,7 @@ function updateLight(floorplan, player, refreshAll = false) {
 		}
 	}
 
+
 	// for (let tile of floorplan.tiles) {
 	// 	let totalRed = 0;
 	// 	let totalGreen = 0;
@@ -160,15 +161,39 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 				continue;
 			}	
 			if (lightSource.hasLineOfSight[x + y * MAP_WIDTH]) {
-				let light = lightSource.color;
-				let r = light[0];
-				let g = light[1];
-				let b = light[2];
-				lightSource.cache[x + y * MAP_WIDTH] = [r * fallOffValues[distance], g * fallOffValues[distance], b * fallOffValues[distance]];
+				let newLight = lightSource.color;
+				let r = newLight[0] * fallOffValues[distance];
+				let g = newLight[1] * fallOffValues[distance];
+				let b = newLight[2]	* fallOffValues[distance];
+				let newLightColor = color(r, g, b);
+				lightSource.cache[x + y * MAP_WIDTH] = [r, g, b];
 				let tile = floorplan.get(x, y);
-				tile.light[0] += r * fallOffValues[distance];
-				tile.light[1] += g * fallOffValues[distance];
-				tile.light[2] += b * fallOffValues[distance];
+				// tile.light = [tile.light[0] + r * fallOffValues[distance], tile.light[1] + g * fallOffValues[distance], tile.light[2] + b * fallOffValues[distance]];
+				let oldLightColor = color(tile.light);
+				let oldRed = red(oldLightColor);
+				let oldGreen = green(oldLightColor);
+				let oldBlue = blue(oldLightColor);
+				let combinedRed = r * fallOffValues[distance] + oldRed;
+				let combinedGreen = g * fallOffValues[distance] + oldGreen;
+				let combinedBlue = b * fallOffValues[distance] + oldBlue;
+				let combinedLightColor = color(combinedRed, combinedGreen, combinedBlue);
+				colorMode(HSB);
+				let combinedHue = hue(combinedLightColor);
+				let newHue = hue(newLightColor);
+				let newSaturation = saturation(newLightColor);
+				let newBrightness = brightness(newLightColor);
+				let oldHue = hue(oldLightColor);
+				let oldSaturation = saturation(oldLightColor);
+				let oldBrightness = brightness(oldLightColor) * fallOffValues[distance];	
+				let combinedBrightness = newBrightness + oldBrightness;
+				let totalSaturation = newSaturation + oldSaturation;	
+				let combinedSaturation = (newBrightness/combinedBrightness) * newSaturation + (oldBrightness/combinedBrightness) * oldSaturation;
+				if (combinedSaturation === NaN) {
+					combinedSaturation = 0;
+				}
+				let newColor = color(combinedHue, combinedSaturation, combinedBrightness);
+				colorMode(RGB);
+				tile.light = [red(newColor), green(newColor), blue(newColor)];
 			}
 		}
 	}
