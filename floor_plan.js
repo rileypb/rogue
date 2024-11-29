@@ -3,7 +3,7 @@ function lerpArray(a, b, t) {
 }
 
 function arrayToColor(a) {
-	return color(Math.max(0, Math.min(255, a[0])), Math.max(0, Math.min(255, a[1])), Math.max(0, Math.min(255, a[2])));
+	return color(a);
 }
 
 class Tile {
@@ -14,7 +14,7 @@ class Tile {
 		this.x = x;
 		this.y = y;
 
-		this.light = [0, 0, 0];
+		this.light = 0;
 		this.feature = null;
 
 		this.hasBeenSeen = false;
@@ -96,7 +96,7 @@ class Tile {
 	}
 
 	hasSufficientLight() {
-		return this.light[0] + this.light[1] + this.light[2] > LIGHT_THRESHOLD;
+		return this.light > LIGHT_THRESHOLD;
 	}
 
 	onEnter(player) {
@@ -213,41 +213,40 @@ class FloorPlan {
 
 	getColor(x, y) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-			return [0,0,0];
+			return [0, 0, 0];
 		}
 		if (!this.get(x, y).visible) {
-			return [0,0,0];
+			return [0, 0, 0];
 		}
-		if (this.get(x, y) instanceof Lava) {
-			return this.getColor2(x, y);
-		}
+		if (this.get(x, y) instanceof Lava || this.get(x, y) instanceof Water) {
+			let l = this.get(x, y).getLight();
+			let resultingLight;
+			if (this.get(x, y).isLit()) {
+				resultingLight = l + this.get(x,y).lightSource.flickerFactor;
+			} else {
+				resultingLight = l;
+			}
+			if (this.get(x, y) instanceof Lava) {
+				return [resultingLight, 0, 0];
+			} else {
+				colorMode(HSB);
+				let c = color(240, 50, 100*resultingLight/255)
+				colorMode(RGB);
+				return [c._getRed(), c._getGreen(), c._getBlue()];
+			}
+		} 
 
 		let l = color(this.get(x, y).getLight());
 		let c = color(this.get(x, y).getBaseColor());
 		colorMode(HSB);
 		let brightness = l._getBrightness() + globalFlickerFactor;
-		let baseBrightness = c._getBrightness();
-		let totalBrightness = brightness + baseBrightness;
-		let hue = (baseBrightness/totalBrightness * c._getHue() + brightness/totalBrightness * l._getHue()) % 360;
-		let saturation = (l._getSaturation() + c._getSaturation()) / 2;
-		let final = color(hue, saturation, brightness);
+		let h = hue(c);
+		let final = color(h, saturation(c), brightness);
 		colorMode(RGB);
 		return [final._getRed(), final._getGreen(), final._getBlue()];
 	}
 
-	getColor2(x, y) {
-		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-			return [0,0,0];
-		}
-		if (!this.get(x, y).visible) {
-			return [0,0,0];
-		}
-		if (!this.get(x, y) instanceof Lava) {
-			return this.getColor(x, y);
-		}
-		let l = this.get(x, y).getLight();
-		return [0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor];
-	}
+
 
 	updateFlicker() {
 		for (let tile of this.tiles) {
@@ -752,7 +751,7 @@ FLOOR_MATERIAL_TILE = 4;
 FLOOR_MATERIAL_SAND = 5;
 
 class Floor extends Tile {
-	MATERIAL_COLORS = [ [0, 0, 0], [139, 69, 19], [0, 128, 0], [139, 69, 19], [192, 192, 192], [255, 255, 0] ];
+	MATERIAL_COLORS = [ [0, 0, 0], [133, 94, 66], [0, 128, 0], [139, 69, 19], [192, 192, 192], [255, 255, 0] ];
 	MATERIAL_SYMBOLS = [ ['.', '.'], ['=', '='], ['"', '"'], ['.', '.'], ['.', '.'], ['.', '.'] ];
 
 	constructor(x, y, material) {
@@ -792,7 +791,7 @@ class Floor extends Tile {
 		} else if (!symbol_only) {
 			this.drawDefaultBackground();
 
-			let c = color(this.light[0], this.light[1], this.light[2]);
+			let c = color(this.light);
 			fill(arrayToColor(c));
 			stroke(c);
 		}
@@ -985,7 +984,7 @@ class Water extends Tile {
 		super(x, y);
 		this.depth = depth;
 		this.color = [0, 0, 128];
-		this.lightSource = new LightSource(this.color, 0.1);
+		this.lightSource = new LightSource(32, 0.1);
 	}
 
 	avoidOnPathfinding() {
@@ -995,9 +994,9 @@ class Water extends Tile {
 
 	render(asNeighbor=false, symbol_only=false) {
 		// this.lightSource.updateFlickerFactor();
-		let c = color(this.light[0], this.light[1], this.light[2]);
+		let c = color(this.light);
 		let ls = this.lightSource.getLight();
-		let lsc = arrayToColor(ls[0], ls[1], ls[2]);
+		let lsc = color(ls);
 		// let useColor = lerpColor(lsc, c, 0.5);
 		// fill(useColor);
 		// stroke(useColor);
@@ -1080,9 +1079,7 @@ class Water extends Tile {
 	// }
 
 	getLight() {
-		let l = this.light.map(x => x * this.lightSource.flickerFactor);
-		l[2] *= 3;
-		return l;
+		return this.light * this.lightSource.flickerFactor;
 	}
 
 	isEnterable() {
@@ -1126,8 +1123,8 @@ class Lava extends Tile {
 
 	constructor(x, y) {
 		super(x, y);
-		this.color = [512, 0, 0];
-		this.lightSource = new LightSource([16, 16, 16], 0.2);
+		this.color = 192;
+		this.lightSource = new LightSource(32, 0.2);
 	}
 
 	avoidOnPathfinding() {
@@ -1257,7 +1254,7 @@ class Lava extends Tile {
 	}
 
 	getLight() {
-		return this.color.map(x => x * this.lightSource.flickerFactor);
+		return this.color * this.lightSource.flickerFactor;
 	}
 
 	getColor() {

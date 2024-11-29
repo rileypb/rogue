@@ -28,7 +28,7 @@ function updateLight(floorplan, player) {
 	// reset light
 	for (let tile of floorplan.tiles) {
 		if (tile) {
-			tile.light = [0, 0, 0];
+			tile.light = 0;
 		}
 	}
 	// cast player's torchlight
@@ -110,7 +110,7 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 				let floorTile = floorplan.get(x, y);
 				if (floorTile != null) {
 					let existingLight = floorTile.light;
-					floorTile.light = [existingLight[0] + light[0] * fallOffValues[Math.round(distance)], existingLight[1] + light[1] * fallOffValues[Math.round(distance)], existingLight[2] + light[2] * fallOffValues[Math.round(distance)]];
+					floorTile.light = existingLight + light * fallOffValues[Math.floor(distance)];
 				}
 			}
 		}

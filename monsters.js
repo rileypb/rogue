@@ -15,7 +15,7 @@ class Monster {
 
 	draw() {
 		let tile = gameState.currentFloor().get(this.x, this.y);
-		let brightness = (tile.light[0] + tile.light[1] + tile.light[2]) / 500;
+		let brightness = tile.light;
 		let thisColor = color(this.color._getRed() * brightness, this.color._getGreen() * brightness, this.color._getBlue() * brightness);
 		fill(thisColor);
 		stroke(thisColor);
