@@ -78,7 +78,7 @@ function setup() {
 	for (let i = 0; i <= MAX_LIGHT_DISTANCE; i++) {
 		fallOffValues.push(LIGHT_FALL_OFF ** i);
 	}
-	playerLightSource = new LightSource(192, 0.1);
+	playerLightSource = new LightSource(128, 0.1);
 	gameState.player.calculateLineOfSight(gameState.currentFloor());
 	updateLight(gameState.currentFloor(), gameState.player, true);
 	gameState.player.calculateSight(gameState.currentFloor());

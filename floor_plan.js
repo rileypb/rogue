@@ -230,7 +230,10 @@ class FloorPlan {
 				return [resultingLight, 0, 0];
 			} else {
 				colorMode(HSB);
-				let c = color(240, 50, 100*resultingLight/255)
+				let scaled = resultingLight/128;
+				let squared = scaled * scaled;
+				let brightness = 100 * squared;
+				let c = color(240, 50, brightness);
 				colorMode(RGB);
 				return [c._getRed(), c._getGreen(), c._getBlue()];
 			}
@@ -302,7 +305,7 @@ class FloorPlan {
 				dy = ySpace - 1;
 			}
 			let isLava = Math.random() < 0.03;
-			let isWater = Math.random() < 0.03;
+			let isWater = Math.random() < 0.3;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
 			let materialIndex = Math.floor(Math.random() * 5);
