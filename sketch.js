@@ -8,8 +8,8 @@ let autoMoveTask;
 const GRID_SIZE_X = 16;
 const GRID_SIZE_Y = 16;
 const FONT_NAME = 'monospace';
-const MAP_WIDTH = 60;
-const MAP_HEIGHT = 60;
+const MAP_WIDTH = 58;
+const MAP_HEIGHT = 58;
 
 let CANVAS_WIDTH;
 let CANVAS_HEIGHT;
@@ -63,7 +63,7 @@ function setup() {
 	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderWidth);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, holderHeight);
 
-	myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
+	myCanvas = createCanvas(CANVAS_WIDTH + 432, CANVAS_HEIGHT + 32, WEBGL);
 	myCanvas.parent('sketch-holder');
 	sizeCanvas();
 	cursor(CROSS);
@@ -112,14 +112,14 @@ function windowResized() {
 	let holderHeight = window.innerHeight;
 	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderWidth);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, holderHeight);
-	resizeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	resizeCanvas(CANVAS_WIDTH + 432, CANVAS_HEIGHT + 32);
 }
 
 function sizeCanvas() {
 	let minDimension = Math.min(windowWidth, windowHeight);
 	CANVAS_WIDTH = minDimension;
 	CANVAS_HEIGHT = minDimension;
-	resizeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	resizeCanvas(CANVAS_WIDTH + 400, CANVAS_HEIGHT);
 }
 
 function windowResized() {
@@ -162,7 +162,7 @@ function setupGameState(gameState) {
 		drawBottom = MAP_PIXEL_HEIGHT + 1;
 		drawTop = drawBottom - CANVAS_HEIGHT;
 	}
-	console.log(drawLeft, drawTop, drawRight, drawBottom);
+	// console.log(drawLeft, drawTop, drawRight, drawBottom);
 }
 
 
@@ -189,6 +189,7 @@ function draw() {
 		drawBottom = MAP_PIXEL_HEIGHT;
 		drawTop = drawBottom - CANVAS_HEIGHT;
 	}
+	// console.log(drawLeft, drawTop, drawRight, drawBottom);
 
 	// updateLight(gameState.currentFloor());
 	//render();

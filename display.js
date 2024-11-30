@@ -5,15 +5,35 @@ HORIZON = 100000;
 let offsetX = 0;
 let offsetY = 0;
 
+let correctionX = 24;
+let correctionY = 24;
+
+function mask() {
+	rect(16, 16, CANVAS_WIDTH - 32, CANVAS_HEIGHT - 32);
+}
+
 function render() {
-	background(BACKGROUND_COLOR);
 	resetMatrix();
+	background(BACKGROUND_COLOR);
 	// translate(-drawLeft, -drawTop);
-	translate(-drawLeft-CANVAS_WIDTH/2 + shiftX, -drawTop-CANVAS_HEIGHT/2 + shiftY);	
+	translate(-correctionX - drawLeft-(CANVAS_WIDTH+400)/2 + shiftX, -correctionY - drawTop-CANVAS_HEIGHT/2 + shiftY);
 	drawFloorPlan();
 	drawEnemies();
 	drawPlayer();
 	drawCursor();
+
+	resetMatrix();
+	translate(-(CANVAS_WIDTH+400)/2, -CANVAS_HEIGHT/2);
+	stroke(255,255,255,128);
+	fill(255,255,255,128);
+	for (let u = 0; u < gameState.currentFloor().width + 2; u++) {
+		text('#', u * GRID_SIZE_X, 16);
+		text('#', u * GRID_SIZE_X, gameState.currentFloor().height * GRID_SIZE_Y + 32);
+	}
+	for (let v = 2; v < gameState.currentFloor().height + 2; v++) {
+		text('#', 0, v * GRID_SIZE_Y);
+		text('#', gameState.currentFloor().width * GRID_SIZE_X + 16, v * GRID_SIZE_Y);
+	}
 }
 
 function drawFloorPlan() {
@@ -115,8 +135,16 @@ function drawFloorPlan() {
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
-	let x = Math.floor((mouseX + drawLeft - shiftX) / GRID_SIZE_X);
-	let y = Math.floor((mouseY + drawTop - shiftY) / GRID_SIZE_Y);
+	console.log("mouseX, mouseY", mouseX, mouseY);
+	console.log("drawLeft, drawTop", drawLeft, drawTop);
+	console.log("shiftX, shiftY", shiftX, shiftY);
+	console.log("GRID_SIZE_X, GRID_SIZE_Y", GRID_SIZE_X, GRID_SIZE_Y);
+	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX) / GRID_SIZE_X);
+	let y = Math.floor((correctionY + mouseY + drawTop - shiftY) / GRID_SIZE_Y);
+	console.log("x, y", x, y);
+	if (x < 0 || x >= gameState.currentFloor().width || y < 0 || y >= gameState.currentFloor().height) {
+		return;
+	}
 	if (autoMoveTask.autoMoveInProgress && path && path.length > 0) {
 		x = path[0].x;
 		y = path[0].y;
