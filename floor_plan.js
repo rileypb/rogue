@@ -32,17 +32,6 @@ class Tile {
 
 	}
 
-	computeBevel() {
-		if (this.isTransparent()) {
-			return;
-		}
-		// NE corner is beveled if the tiles to the N and E are transparent.
-		this.bevelNE = this.isTransparent(this.x, this.y - 1) && this.isTransparent(this.x + 1, this.y);
-		this.bevelSE = this.isTransparent(this.x, this.y + 1) && this.isTransparent(this.x + 1, this.y);
-		this.bevelSW = this.isTransparent(this.x, this.y + 1) && this.isTransparent(this.x - 1, this.y);
-		this.bevelNW = this.isTransparent(this.x, this.y - 1) && this.isTransparent(this.x - 1, this.y);
-	}
-
 	render() {
 		// Do nothing
 	}
@@ -179,12 +168,6 @@ class FloorPlan {
 		this.monsters = [];
 	}
 
-	computeBevel() {
-		for (let tile of this.tiles) {
-			tile.computeBevel();
-		}
-	}
-
 	get(x, y) {
 		return this.tiles[x + y * this.width];
 	}
@@ -278,7 +261,6 @@ class FloorPlan {
 				generateCastle(this);
 				break;
 		}
-		this.computeBevel();
 	}
 
 	generateNatural() {
@@ -795,8 +777,7 @@ class Floor extends Tile {
 			this.drawDefaultBackground();
 
 			let c = color(this.light);
-			fill(arrayToColor(c));
-			stroke(c);
+			fill(0);
 		}
 		if (!asNeighbor && this.hasBeenSeen) {
 			text(this.MATERIAL_SYMBOLS[this.material][(this.x + this.y) % 2], (this.x + 0.2) * GRID_SIZE_X, (this.y + 0.80) * GRID_SIZE_Y);
@@ -1086,7 +1067,7 @@ class Water extends Tile {
 	}
 
 	isEnterable() {
-		return true;
+		return false;
 	}
 
 	isLeavable() {
@@ -1265,7 +1246,7 @@ class Lava extends Tile {
 	}
 
 	isEnterable() {
-		return true;
+		return false;
 	}
 
 	isLeavable() {
