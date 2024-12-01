@@ -5,8 +5,8 @@ HORIZON = 100000;
 let offsetX = 0;
 let offsetY = 0;
 
-let correctionX = 24;
-let correctionY = 24;
+let correctionX = 32;
+let correctionY = 32;
 
 function mask() {
 	rect(16, 16, CANVAS_WIDTH - 32, CANVAS_HEIGHT - 32);
@@ -14,25 +14,36 @@ function mask() {
 
 function render() {
 	resetMatrix();
+	push();
 	background(BACKGROUND_COLOR);
+	translate(-(CANVAS_WIDTH+400)/2, -CANVAS_HEIGHT/2);
+	beginClip();
+	rect(16, 16, CANVAS_WIDTH - 32, CANVAS_HEIGHT - 48);
+	endClip();
+	// fill(255);	
+	// rect(16, 16, CANVAS_WIDTH - 32, CANVAS_HEIGHT - 48);
+	resetMatrix();
 	// translate(-drawLeft, -drawTop);
-	translate(-correctionX - drawLeft-(CANVAS_WIDTH+400)/2 + shiftX, -correctionY - drawTop-CANVAS_HEIGHT/2 + shiftY);
+	translate(-correctionX - drawLeft-(CANVAS_WIDTH+400)/2 + shiftX + 48, -correctionY - drawTop-CANVAS_HEIGHT/2 + shiftY + 48);
 	drawFloorPlan();
 	drawEnemies();
 	drawPlayer();
 	drawCursor();
 
 	resetMatrix();
+	pop();
 	translate(-(CANVAS_WIDTH+400)/2, -CANVAS_HEIGHT/2);
 	stroke(255,255,255,128);
 	fill(255,255,255,128);
-	for (let u = 0; u < gameState.currentFloor().width + 2; u++) {
+	let borderWidth = Math.floor(CANVAS_WIDTH/GRID_SIZE_X);
+	let borderHeight = Math.floor(CANVAS_HEIGHT/GRID_SIZE_Y);
+	for (let u = 1; u < borderWidth; u++) {
 		text('#', u * GRID_SIZE_X, 16);
-		text('#', u * GRID_SIZE_X, gameState.currentFloor().height * GRID_SIZE_Y + 32);
+		text('#', u * GRID_SIZE_X, borderHeight * GRID_SIZE_Y);
 	}
-	for (let v = 2; v < gameState.currentFloor().height + 2; v++) {
+	for (let v = 1; v < borderHeight + 1; v++) {
 		text('#', 0, v * GRID_SIZE_Y);
-		text('#', gameState.currentFloor().width * GRID_SIZE_X + 16, v * GRID_SIZE_Y);
+		text('#', borderWidth * GRID_SIZE_X, v * GRID_SIZE_Y);
 	}
 }
 
@@ -139,8 +150,8 @@ function drawCursor() {
 	console.log("drawLeft, drawTop", drawLeft, drawTop);
 	console.log("shiftX, shiftY", shiftX, shiftY);
 	console.log("GRID_SIZE_X, GRID_SIZE_Y", GRID_SIZE_X, GRID_SIZE_Y);
-	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX) / GRID_SIZE_X);
-	let y = Math.floor((correctionY + mouseY + drawTop - shiftY) / GRID_SIZE_Y);
+	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX - 48) / GRID_SIZE_X);
+	let y = Math.floor((correctionY + mouseY + drawTop - shiftY - 48) / GRID_SIZE_Y);
 	console.log("x, y", x, y);
 	if (x < 0 || x >= gameState.currentFloor().width || y < 0 || y >= gameState.currentFloor().height) {
 		return;
@@ -211,6 +222,9 @@ function drawCursor() {
 }
 
 function drawPlayer() {
+	fill(0);
+	stroke(0);
+	text('@', (gameState.player.x + 0.08) * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y) + 0.03;
 	fill(255);
 	stroke(255);
 	text('@', (gameState.player.x + 0.05) * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y);

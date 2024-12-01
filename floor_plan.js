@@ -163,7 +163,7 @@ class FloorPlan {
 			}
 		}
 		this.floorIndex = 0;
-		this.type = this.NATURAL;
+		this.type = this.ONE_ROOM;
 
 		this.monsters = [];
 	}
@@ -314,8 +314,8 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.000) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 128, Math.random() * 128, Math.random() * 128]);
+						if (Math.random() < 0.01) {
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, Math.random() * 128 + 64);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
@@ -490,7 +490,7 @@ class FloorPlan {
 		// place a lamp in the center
 		let x = Math.floor(this.width / 2);
 		let y = Math.floor(this.height / 2);
-		this.tiles[x + y * this.width] = new Lamp(x, y, [255, 128, 0]);
+		this.tiles[x + y * this.width] = new Lamp(x, y, 192);
 		// x = Math.floor(2*this.width / 3) - 8;
 		// y = Math.floor(2*this.height / 3) - 2;
 		// this.tiles[x + y * this.width] = new Lamp(x, y, color(255, 255, 0));

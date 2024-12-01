@@ -116,7 +116,7 @@ function windowResized() {
 }
 
 function sizeCanvas() {
-	let minDimension = Math.min(windowWidth, windowHeight);
+	let minDimension = Math.min(windowWidth - 400, windowHeight);
 	CANVAS_WIDTH = minDimension;
 	CANVAS_HEIGHT = minDimension;
 	resizeCanvas(CANVAS_WIDTH + 400, CANVAS_HEIGHT);
@@ -143,24 +143,24 @@ function setupGameState(gameState) {
 	hMargin = 6 * GRID_SIZE_X;
 	vMargin = 6 * GRID_SIZE_Y;
 
-	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2;
+	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2 + 48;
 	if (drawLeft < 0) {
 		drawLeft = 0;
 	}
 	drawRight = drawLeft + CANVAS_WIDTH;
 	if (drawRight > MAP_PIXEL_WIDTH + 1) {
-		drawRight = MAP_PIXEL_WIDTH + 1;
+		drawRight = MAP_PIXEL_WIDTH + 1 + 16;
 		drawLeft = drawRight - CANVAS_WIDTH;
 	}
 
-	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2;
+	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2 - 48;
 	if (drawTop < 0) {
 		drawTop = 0;
 	}
-	drawBottom = drawTop + CANVAS_HEIGHT;
+	drawBottom = drawTop + CANVAS_HEIGHT - 48;
 	if (drawBottom > MAP_PIXEL_HEIGHT + 1) {
-		drawBottom = MAP_PIXEL_HEIGHT + 1;
-		drawTop = drawBottom - CANVAS_HEIGHT;
+		drawBottom = MAP_PIXEL_HEIGHT + 1 + 48;
+		drawTop = drawBottom - CANVAS_HEIGHT + 48;
 	}
 	// console.log(drawLeft, drawTop, drawRight, drawBottom);
 }
@@ -170,13 +170,13 @@ function setupGameState(gameState) {
 function draw() {
 	taskManager.runTasks();
 
-	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2;
+	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2 + 48;
 	if (drawLeft < 0) {
 		drawLeft = 0;
 	}
 	drawRight = drawLeft + CANVAS_WIDTH;
-	if (drawRight > MAP_PIXEL_WIDTH) {
-		drawRight = MAP_PIXEL_WIDTH;
+	if (drawRight > MAP_PIXEL_WIDTH + 32) {
+		drawRight = MAP_PIXEL_WIDTH + 32;
 		drawLeft = drawRight - CANVAS_WIDTH;
 	}
 
@@ -185,8 +185,8 @@ function draw() {
 		drawTop = 0;
 	}
 	drawBottom = drawTop + CANVAS_HEIGHT;
-	if (drawBottom > MAP_PIXEL_HEIGHT) {
-		drawBottom = MAP_PIXEL_HEIGHT;
+	if (drawBottom > MAP_PIXEL_HEIGHT + 48) {
+		drawBottom = MAP_PIXEL_HEIGHT + 48;
 		drawTop = drawBottom - CANVAS_HEIGHT;
 	}
 	// console.log(drawLeft, drawTop, drawRight, drawBottom);

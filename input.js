@@ -85,8 +85,8 @@ function touchEnded() {
 }
 
 function mouseReleased() {
-	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX) / GRID_SIZE_X);
-	let y = Math.floor((correctionY + mouseY + drawTop - shiftY) / GRID_SIZE_Y);
+	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX - 48) / GRID_SIZE_X);
+	let y = Math.floor((correctionY + mouseY + drawTop - shiftY - 48) / GRID_SIZE_Y);
 	let targetTile = gameState.currentFloor().get(x, y);
 	if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
 		return;
