@@ -60,7 +60,7 @@ function setup() {
 	let sketchHolder = document.getElementById('sketch-holder');
 	let holderWidth = sketchHolder.clientWidth;
 	let holderHeight = windowHeight;
-	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderWidth);
+	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, holderHeight);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, holderHeight);
 
 	myCanvas = createCanvas(CANVAS_WIDTH + 432, CANVAS_HEIGHT + 32, WEBGL);
@@ -171,6 +171,7 @@ function draw() {
 	taskManager.runTasks();
 
 	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2 + 48;
+	drawLeft -= (drawLeft % 16);
 	if (drawLeft < 0) {
 		drawLeft = 0;
 	}
@@ -178,9 +179,11 @@ function draw() {
 	if (drawRight > MAP_PIXEL_WIDTH + 32) {
 		drawRight = MAP_PIXEL_WIDTH + 32;
 		drawLeft = drawRight - CANVAS_WIDTH;
+		drawLeft -= (drawLeft % 16);
 	}
 
 	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2;
+	drawTop -= (drawTop % 16);
 	if (drawTop < 0) {
 		drawTop = 0;
 	}
@@ -188,7 +191,10 @@ function draw() {
 	if (drawBottom > MAP_PIXEL_HEIGHT + 48) {
 		drawBottom = MAP_PIXEL_HEIGHT + 48;
 		drawTop = drawBottom - CANVAS_HEIGHT;
+		drawTop -= (drawTop % 16);
 	}
+
+	updatePointerStatusText();
 	// console.log(drawLeft, drawTop, drawRight, drawBottom);
 
 	// updateLight(gameState.currentFloor());
@@ -242,3 +248,11 @@ function keyPressed() {
 	// inputTask.run();
 
 }		
+
+let pointerStatusText = "";
+
+function updatePointerStatusText() {
+	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX - 48) / GRID_SIZE_X);
+	let y = Math.floor((correctionY + mouseY + drawTop - shiftY - 48) / GRID_SIZE_Y);
+	pointerStatusText = "x: " + x + " y: " + y + " drawLeft: " + drawLeft + " drawTop: " + drawTop + "\nshiftX: " + shiftX + " shiftY: " + shiftY;
+}

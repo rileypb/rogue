@@ -18,7 +18,7 @@ function render() {
 	background(BACKGROUND_COLOR);
 	translate(-(CANVAS_WIDTH+400)/2, -CANVAS_HEIGHT/2);
 	beginClip();
-	rect(16, 16, CANVAS_WIDTH - 32, CANVAS_HEIGHT - 48);
+	rect(16, 16, CANVAS_WIDTH - 16, CANVAS_HEIGHT - 32);
 	endClip();
 	// fill(255);	
 	// rect(16, 16, CANVAS_WIDTH - 32, CANVAS_HEIGHT - 48);
@@ -45,6 +45,8 @@ function render() {
 		text('#', 0, v * GRID_SIZE_Y);
 		text('#', borderWidth * GRID_SIZE_X, v * GRID_SIZE_Y);
 	}
+
+	drawRightSide();
 }
 
 function drawFloorPlan() {
@@ -237,4 +239,13 @@ function drawEnemies() {
 			monster.draw();
 		}
 	}
+}
+
+function drawRightSide() {
+	translate(CANVAS_WIDTH, 32);
+	fill(255);
+	stroke(0);
+	textSize(16);
+	text("Health: " + gameState.player.health, 16, 16);
+	text(pointerStatusText, 16, 32);
 }
