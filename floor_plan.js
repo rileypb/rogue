@@ -163,7 +163,7 @@ class FloorPlan {
 			}
 		}
 		this.floorIndex = 0;
-		this.type = this.ONE_ROOM;
+		this.type = this.NATURAL;
 
 		this.monsters = [];
 	}
