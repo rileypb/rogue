@@ -248,10 +248,21 @@ function drawEnemies() {
 }
 
 function drawRightSide() {
-	translate(CANVAS_WIDTH, 32);
+	translate(CANVAS_WIDTH + 16, 32);
 	fill(255);
 	stroke(0);
 	textSize(16);
-	text("Health: " + gameState.player.health, 16, 16);
-	text(pointerStatusText, 16, 32);
+	let tile = gameState.currentFloor().get(gameState.player.x, gameState.player.y);
+	text("You are standing on " + tile.getDescription(), 0, 0);
+	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX - 48) / GRID_SIZE_X);
+	let y = Math.floor((correctionY + mouseY + drawTop - shiftY - 48) / GRID_SIZE_Y);
+	let pointerTile = gameState.currentFloor().get(x, y);
+	if (pointerTile == null) {
+		return;
+	}
+	if (pointerTile.hasBeenSeen) {
+		text("You are pointing at " + pointerTile.getDescription(), 0, 16);
+	} else {
+		text("You have not seen that place yet.", 0, 16);
+	}
 }

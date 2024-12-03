@@ -32,6 +32,10 @@ class Tile {
 
 	}
 
+	getDescription() {
+		return "a void";
+	}
+
 	render() {
 		// Do nothing
 	}
@@ -181,13 +185,13 @@ class Tile {
 		// } else {
 			noStroke();
 		// }
-		vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+		vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y + 2);
 		fill(arrayToColor(cornerColors[1]));
-		vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+		vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y + 2);
 		fill(arrayToColor(cornerColors[3]));
-		vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y + 2);
 		fill(arrayToColor(cornerColors[2]));
-		vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y + 2);
 		endShape(CLOSE);
 	}
 
@@ -764,6 +768,10 @@ class Wall extends Tile {
 		this.kind = kind;
 	}
 
+	getDescription() {
+		return 'a wall';
+	}
+
 	avoidOnPathfinding() {
 		return true;
 	}
@@ -890,12 +898,31 @@ class Floor extends Tile {
 			if ((this.material == FLOOR_MATERIAL_TILE || this.material == FLOOR_MATERIAL_TILE_2) && this.visible) {
 				stroke(192);
 				noFill();
-				rect(this.x * GRID_SIZE_X + 2, this.y * GRID_SIZE_Y + 2, GRID_SIZE_X - 2, GRID_SIZE_Y - 2);
+				rect(this.x * GRID_SIZE_X + 2 - 2, this.y * GRID_SIZE_Y + 2 + 1, GRID_SIZE_X - 2, GRID_SIZE_Y - 2);
 				stroke(128);
-				rect(this.x * GRID_SIZE_X + 1, this.y * GRID_SIZE_Y + 1, GRID_SIZE_X - 1, GRID_SIZE_Y - 1);
+				rect(this.x * GRID_SIZE_X + 1 - 2, this.y * GRID_SIZE_Y + 1 + 1, GRID_SIZE_X - 1, GRID_SIZE_Y - 1);
 			} else {
 				text(this.MATERIAL_SYMBOLS[this.material][(this.x + this.y) % 2], (this.x + 0.2) * GRID_SIZE_X, (this.y + 0.80) * GRID_SIZE_Y);
 			}
+		}
+	}
+
+	getDescription() {
+		switch (this.material) {
+			case FLOOR_MATERIAL_STONE:
+				return 'a stone floor';
+			case FLOOR_MATERIAL_WOOD:
+				return 'a wooden floor';
+			case FLOOR_MATERIAL_GRASS:
+				return 'grass';
+			case FLOOR_MATERIAL_DIRT:
+				return 'dirt';
+			case FLOOR_MATERIAL_TILE:
+				return 'a tile floor';
+			case FLOOR_MATERIAL_SAND:
+				return 'sand';
+			case FLOOR_MATERIAL_TILE_2:
+				return 'a tile floor';
 		}
 	}
 
@@ -981,6 +1008,10 @@ class Lamp extends Tile {
 		super(x, y);
 		this.color = color;
 		this.lightSource = new LightSource(color, 0.1);
+	}
+
+	getDescription() {
+		return 'a lamp';
 	}
 
 	avoidOnPathfinding() {
@@ -1126,6 +1157,10 @@ class Water extends Tile {
 		this.depth = depth;
 		this.color = [0, 0, 128];
 		this.lightSource = new LightSource(32, 0.1);
+	}
+
+	getDescription() {
+		return 'water';
 	}
 
 	avoidOnPathfinding() {
@@ -1274,6 +1309,10 @@ class Lava extends Tile {
 		super(x, y);
 		this.color = 192;
 		this.lightSource = new LightSource(32, 0.2);
+	}
+
+	getDescription() {
+		return 'lava';
 	}
 
 	avoidOnPathfinding() {
