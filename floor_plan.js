@@ -52,6 +52,14 @@ class Tile {
 		return [0, 0, 0];
 	}
 
+	getReflectiveness() {
+		return 0.5;
+	}
+
+	getSpecularity() {
+		return 1;
+	}
+
 	avoidOnPathfinding() {
 		return false;
 	}
@@ -282,6 +290,10 @@ class FloorPlan {
 		let centerIsVisible = this.isVisible(cx, cy);
 		if (((thisIsSquare && thisIsVisible) || (centerIsSquare && centerIsVisible))) {
 			let b1 = this.getLight(x, y);
+			let reflectiveness = this.getReflectiveness(x, y);
+			let specularity = this.getSpecularity(x, y);
+			b1 = (b1/100) ** specularity * 100;
+			b1 = b1 * reflectiveness;
 			let baseColor = color(this.getBaseColor(cx, cy));
 			colorMode(HSB);
 			let h = hue(baseColor);
@@ -292,6 +304,20 @@ class FloorPlan {
 		}
 
 		return this.getColor(x, y);
+	}
+
+	getReflectiveness(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return 0;
+		}
+		return this.get(x, y).getReflectiveness();
+	}
+
+	getSpecularity(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return 1;
+		}
+		return this.get(x, y).getSpecularity();
 	}
 
 	isVisible(x, y) {
@@ -881,6 +907,45 @@ class Floor extends Tile {
 		return this.material == FLOOR_MATERIAL_TILE || this.material == FLOOR_MATERIAL_TILE_2;
 	} 
 
+	getReflectiveness() {
+		switch (this.material) {
+			case FLOOR_MATERIAL_STONE:
+				return 0.5;
+			case FLOOR_MATERIAL_WOOD:
+				return 0.5;
+			case FLOOR_MATERIAL_GRASS:
+				return 0.4;
+			case FLOOR_MATERIAL_DIRT:
+				return 0.3;
+			case FLOOR_MATERIAL_TILE:
+				return 0.6;
+			case FLOOR_MATERIAL_SAND:
+				return 0.4;
+			case FLOOR_MATERIAL_TILE_2:
+				return 0.6;
+		}
+	}
+
+	getSpecularity() {
+		switch (this.material) {
+			case FLOOR_MATERIAL_STONE:
+				return 1;
+			case FLOOR_MATERIAL_WOOD:
+				return 1;
+			case FLOOR_MATERIAL_GRASS:
+				return 1;
+			case FLOOR_MATERIAL_DIRT:
+				return 1;
+			case FLOOR_MATERIAL_TILE:
+				return 2;
+			case FLOOR_MATERIAL_SAND:
+				return 1;
+			case FLOOR_MATERIAL_TILE_2:
+				return 2;
+		}
+	}
+
+
 	isEnterable() {
 		return true;
 	}
@@ -1156,6 +1221,14 @@ class Water extends Tile {
 
 	getLight() {
 		return this.light * this.lightSource.flickerFactor;
+	}
+
+	getReflectiveness() {
+		return 1;
+	}
+
+	getSpecularity() {
+		return 2;
 	}
 
 	isEnterable() {
