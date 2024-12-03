@@ -148,16 +148,19 @@ function drawFloorPlan() {
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
-	console.log("mouseX, mouseY", mouseX, mouseY);
-	console.log("drawLeft, drawTop", drawLeft, drawTop);
-	console.log("shiftX, shiftY", shiftX, shiftY);
-	console.log("GRID_SIZE_X, GRID_SIZE_Y", GRID_SIZE_X, GRID_SIZE_Y);
+	// console.log("mouseX, mouseY", mouseX, mouseY);
+	// console.log("drawLeft, drawTop", drawLeft, drawTop);
+	// console.log("shiftX, shiftY", shiftX, shiftY);
+	// console.log("GRID_SIZE_X, GRID_SIZE_Y", GRID_SIZE_X, GRID_SIZE_Y);
 	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX - 48) / GRID_SIZE_X);
 	let y = Math.floor((correctionY + mouseY + drawTop - shiftY - 48) / GRID_SIZE_Y);
-	console.log("x, y", x, y);
-	if (x < 0 || x >= gameState.currentFloor().width || y < 0 || y >= gameState.currentFloor().height) {
-		return;
+	if (mouseX < 16 || mouseY < 16 || mouseX > CANVAS_WIDTH -  16 || mouseY > CANVAS_HEIGHT - 32) {
+		x = null;
+		y = null;
 	}
+	// if (x < 0 || x >= gameState.currentFloor().width || y < 0 || y >= gameState.currentFloor().height) {
+	// 	return;
+	// }
 	if (autoMoveTask.autoMoveInProgress && path && path.length > 0) {
 		x = path[0].x;
 		y = path[0].y;
@@ -169,6 +172,9 @@ function drawCursor() {
 		if (Math.abs(shiftY) < 1) {
 			shiftY = 0;
 		}
+	}
+	if (x == null || y == null) {
+		return;
 	}
 	let localPath = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
 	if (localPath) {
@@ -226,10 +232,10 @@ function drawCursor() {
 function drawPlayer() {
 	fill(0);
 	stroke(0);
-	text('@', (gameState.player.x + 0.08) * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y) + 0.03;
+	text('@', (gameState.player.x + 0.08) * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y)
 	fill(255);
 	stroke(255);
-	text('@', (gameState.player.x + 0.05) * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y);
+	text('@', (gameState.player.x + 0.05) * GRID_SIZE_X, (gameState.player.y + 0.96) * GRID_SIZE_Y);
 }
 
 function drawEnemies() {

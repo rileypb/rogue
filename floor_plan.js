@@ -36,6 +36,10 @@ class Tile {
 		// Do nothing
 	}
 
+	isSquare() {
+		return false;
+	}
+
 	getLight() {
 		return this.light;
 	}
@@ -102,6 +106,7 @@ class Tile {
 	}
 
 	drawDefaultBackground() {
+		return this.drawDefaultBackground2();
 		let f = gameState.currentFloor();
 		let colors = [
 			[ f.getColor(this.x - 1, this.y - 1), 
@@ -130,6 +135,44 @@ class Tile {
 		beginShape(TESS);
 		fill(arrayToColor(cornerColors[0]));
 		noStroke();
+		vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+		fill(arrayToColor(cornerColors[1]));
+		vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+		fill(arrayToColor(cornerColors[3]));
+		vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		fill(arrayToColor(cornerColors[2]));
+		vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+		endShape(CLOSE);
+	}
+
+	drawDefaultBackground2() {
+		let f = gameState.currentFloor();
+		let colors = [
+			[ f.getAdaptiveColor(this.x - 1, this.y - 1, this.x,this.y), 
+				f.getAdaptiveColor(this.x, this.y - 1, this.x,this.y),
+				f.getAdaptiveColor(this.x + 1, this.y - 1, this.x,this.y)
+			],
+			[ f.getAdaptiveColor(this.x - 1, this.y, this.x,this.y),
+				f.getAdaptiveColor(this.x, this.y, this.x,this.y),
+				f.getAdaptiveColor(this.x + 1, this.y, this.x,this.y)
+			],
+			[ f.getAdaptiveColor(this.x - 1, this.y + 1, this.x,this.y),
+				f.getAdaptiveColor(this.x, this.y + 1, this.x,this.y),
+				f.getAdaptiveColor(this.x + 1, this.y + 1, this.x,this.y)
+			]
+		];
+		let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
+								lerpArray(lerpArray(colors[0][1], colors[1][2], 0.5), lerpArray(colors[1][1], colors[0][2], 0.5), 0.5),
+								lerpArray(lerpArray(colors[1][0], colors[2][1], 0.5), lerpArray(colors[2][0], colors[1][1], 0.5), 0.5),
+								lerpArray(lerpArray(colors[1][1], colors[2][2], 0.5), lerpArray(colors[2][1], colors[1][2], 0.5), 0.5)
+		];
+		beginShape(TESS);
+		fill(arrayToColor(cornerColors[0]));
+		// if (this instanceof Floor && this.material == FLOOR_MATERIAL_TILE) {
+		// 	stroke(0);
+		// } else {
+			noStroke();
+		// }
 		vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
 		fill(arrayToColor(cornerColors[1]));
 		vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
@@ -232,6 +275,56 @@ class FloorPlan {
 		return [final._getRed(), final._getGreen(), final._getBlue()];
 	}
 
+	getAdaptiveColor(x, y, cx, cy) {
+		let thisIsSquare = this.isSquare(x, y);
+		let centerIsSquare = this.isSquare(cx, cy);
+		let thisIsVisible = this.isVisible(x, y);
+		let centerIsVisible = this.isVisible(cx, cy);
+		if (((thisIsSquare && thisIsVisible) || (centerIsSquare && centerIsVisible))) {
+			let b1 = this.getLight(x, y);
+			let baseColor = color(this.getBaseColor(cx, cy));
+			colorMode(HSB);
+			let h = hue(baseColor);
+			let s = saturation(baseColor);
+			let c2 = color(h, s, b1);
+			colorMode(RGB);
+			return [c2._getRed(), c2._getGreen(), c2._getBlue()];
+		}
+
+		return this.getColor(x, y);
+	}
+
+	isVisible(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return false;
+		}
+		return this.get(x, y).visible;
+	}
+
+	getLight(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return 0;
+		}
+		return this.get(x, y).getLight();
+	}
+
+	getBaseColor(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return [0, 0, 0];
+		}
+		return this.get(x, y).getBaseColor();
+	}
+
+	isSquare(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return true;
+		}
+		let tile = this.get(x, y);
+		if (!tile.visible) {
+			return false;
+		}
+		return tile.isSquare();
+	}
 
 
 	updateFlicker() {
@@ -290,7 +383,7 @@ class FloorPlan {
 			let isWater = Math.random() < 0.3;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
-			let materialIndex = Math.floor(Math.random() * 5);
+			let materialIndex = Math.floor(Math.random() * 7);
 
 			let materialChanged = false;
 			for (let xx = x - 1; xx < x + 1; xx++) {
@@ -314,7 +407,7 @@ class FloorPlan {
 						continue;
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
-						if (Math.random() < 0.01) {
+						if (Math.random() < 0.002) {
 							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, Math.random() * 128 + 64);
 						} else {
 							if (isLava) {
@@ -322,29 +415,7 @@ class FloorPlan {
 							} else if (isWater) {
 								this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
 							} else {
-								switch (materialIndex) {
-									case 0:
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_DIRT);
-										break;
-									case 1:
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_GRASS);
-										break;
-									case 2:
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_TILE);
-										break;
-									case 3:
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_STONE);
-										break;
-									case 4:
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_WOOD);
-										break;
-									case 5: 
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_SAND);
-										break;
-									default:
-										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_DIRT);
-								}
-
+								this.tiles[xx + yy * this.width] = new Floor(xx, yy, materialIndex);
 							}
 						}
 					}
@@ -702,6 +773,15 @@ class Wall extends Tile {
 			text(char, this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
 		}
 	}
+
+	isSquare() {
+		return true;
+	}
+
+	getBaseColor() {
+		// dark brown
+		return [70, 35, 10];
+	}
 }
 
 function canSeePlayer(x, y) {
@@ -734,10 +814,11 @@ FLOOR_MATERIAL_GRASS = 2;
 FLOOR_MATERIAL_DIRT = 3;
 FLOOR_MATERIAL_TILE = 4;
 FLOOR_MATERIAL_SAND = 5;
+FLOOR_MATERIAL_TILE_2 = 6;
 
 class Floor extends Tile {
-	MATERIAL_COLORS = [ [0, 0, 0], [133, 94, 66], [0, 128, 0], [139, 69, 19], [192, 192, 192], [255, 255, 0] ];
-	MATERIAL_SYMBOLS = [ ['.', '.'], ['=', '='], ['"', '"'], ['.', '.'], ['.', '.'], ['.', '.'] ];
+	MATERIAL_COLORS = [ [0, 0, 0], [133, 94, 66], [0, 128, 0], [139, 69, 19], [148, 160, 192], [255, 255, 0], [128, 192, 128] ];
+	MATERIAL_SYMBOLS = [ ['.', '.'], ['=', '='], ['"', '"'], ['.', '.'], ['-', ':'], ['.', '.'], [':', ':'] ];
 
 	constructor(x, y, material) {
 		super(x, y);
@@ -779,15 +860,26 @@ class Floor extends Tile {
 			let c = color(this.light);
 			fill(0);
 		}
-		if (!asNeighbor && this.hasBeenSeen) {
-			text(this.MATERIAL_SYMBOLS[this.material][(this.x + this.y) % 2], (this.x + 0.2) * GRID_SIZE_X, (this.y + 0.80) * GRID_SIZE_Y);
-			
+		 if (!asNeighbor && this.hasBeenSeen) {
+			if ((this.material == FLOOR_MATERIAL_TILE || this.material == FLOOR_MATERIAL_TILE_2) && this.visible) {
+				stroke(192);
+				noFill();
+				rect(this.x * GRID_SIZE_X + 2, this.y * GRID_SIZE_Y + 2, GRID_SIZE_X - 2, GRID_SIZE_Y - 2);
+				stroke(128);
+				rect(this.x * GRID_SIZE_X + 1, this.y * GRID_SIZE_Y + 1, GRID_SIZE_X - 1, GRID_SIZE_Y - 1);
+			} else {
+				text(this.MATERIAL_SYMBOLS[this.material][(this.x + this.y) % 2], (this.x + 0.2) * GRID_SIZE_X, (this.y + 0.80) * GRID_SIZE_Y);
+			}
 		}
 	}
 
 	getBaseColor() {
 		return this.MATERIAL_COLORS[this.material];
 	}
+
+	isSquare() {
+		return this.material == FLOOR_MATERIAL_TILE || this.material == FLOOR_MATERIAL_TILE_2;
+	} 
 
 	isEnterable() {
 		return true;

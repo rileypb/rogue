@@ -82,28 +82,29 @@ function setup() {
 	gameState.player.calculateLineOfSight(gameState.currentFloor());
 	updateLight(gameState.currentFloor(), gameState.player, true);
 	gameState.player.calculateSight(gameState.currentFloor());
+	updatePointerStatusText();
 	render();
 
 	sketchHolder.addEventListener('wheel', function(event) {
 		// translate(-drawLeft-CANVAS_WIDTH/2 + shiftX, -drawTop-CANVAS_HEIGHT/2 + shiftY);
 		event.preventDefault();
-		shiftX += -event.deltaX/5;
-		console.log(shiftX, drawLeft, drawRight, MAP_PIXEL_WIDTH	);
+		shiftX += -event.deltaX;
 		if (-shiftX + drawLeft < 0) {
 			shiftX = drawLeft;
 		}
 		if (-shiftX + drawRight > MAP_PIXEL_WIDTH) {
-			shiftX = -MAP_PIXEL_WIDTH + drawRight;
+			shiftX = -MAP_PIXEL_WIDTH + drawRight - 32;
 		}
 		shiftY += event.deltaY;
 		if (-shiftY + drawTop < 0) {
 			shiftY = drawTop;
 		}
 		if (-shiftY + drawBottom > MAP_PIXEL_HEIGHT) {
-			shiftY = -MAP_PIXEL_HEIGHT + drawBottom;
+			shiftY = -MAP_PIXEL_HEIGHT + drawBottom - 48;
 		}
 		render();
 	});
+
 }
 
 function windowResized() {
@@ -143,24 +144,30 @@ function setupGameState(gameState) {
 	hMargin = 6 * GRID_SIZE_X;
 	vMargin = 6 * GRID_SIZE_Y;
 
+	
+
 	drawLeft = GRID_SIZE_X * gameState.player.x - CANVAS_WIDTH / 2 + 48;
+	drawLeft -= (drawLeft % 16);
 	if (drawLeft < 0) {
 		drawLeft = 0;
 	}
 	drawRight = drawLeft + CANVAS_WIDTH;
-	if (drawRight > MAP_PIXEL_WIDTH + 1) {
-		drawRight = MAP_PIXEL_WIDTH + 1 + 16;
+	if (drawRight > MAP_PIXEL_WIDTH + 32) {
+		drawRight = MAP_PIXEL_WIDTH + 32;
 		drawLeft = drawRight - CANVAS_WIDTH;
+		drawLeft -= (drawLeft % 16);
 	}
 
-	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2 - 48;
+	drawTop = GRID_SIZE_Y * gameState.player.y - CANVAS_HEIGHT / 2;
+	drawTop -= (drawTop % 16);
 	if (drawTop < 0) {
 		drawTop = 0;
 	}
-	drawBottom = drawTop + CANVAS_HEIGHT - 48;
-	if (drawBottom > MAP_PIXEL_HEIGHT + 1) {
-		drawBottom = MAP_PIXEL_HEIGHT + 1 + 48;
-		drawTop = drawBottom - CANVAS_HEIGHT + 48;
+	drawBottom = drawTop + CANVAS_HEIGHT;
+	if (drawBottom > MAP_PIXEL_HEIGHT + 48) {
+		drawBottom = MAP_PIXEL_HEIGHT + 48;
+		drawTop = drawBottom - CANVAS_HEIGHT;
+		drawTop -= (drawTop % 16);
 	}
 	// console.log(drawLeft, drawTop, drawRight, drawBottom);
 }
@@ -254,5 +261,5 @@ let pointerStatusText = "";
 function updatePointerStatusText() {
 	let x = Math.floor((correctionX + mouseX + drawLeft - shiftX - 48) / GRID_SIZE_X);
 	let y = Math.floor((correctionY + mouseY + drawTop - shiftY - 48) / GRID_SIZE_Y);
-	pointerStatusText = "x: " + x + " y: " + y + " drawLeft: " + drawLeft + " drawTop: " + drawTop + "\nshiftX: " + shiftX + " shiftY: " + shiftY;
+	pointerStatusText = "x: " + mouseX + " y: " + mouseY + " drawLeft: " + drawLeft + " drawTop: " + drawTop + "\nshiftX: " + shiftX + " shiftY: " + shiftY;
 }
