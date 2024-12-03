@@ -409,7 +409,7 @@ class FloorPlan {
 			if (dy > ySpace) {
 				dy = ySpace - 1;
 			}
-			let isLava = Math.random() < 0.03;
+			let isLava = Math.random() < 0.3;
 			let isWater = Math.random() < 0.3;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
@@ -1356,13 +1356,13 @@ class Lava extends Tile {
 				beginShape(TESS);
 				fill(arrayToColor(cornerColors[0]));
 				noStroke();
-				vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+				vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y + 2);
 				fill(arrayToColor(cornerColors[1]));
-				vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+				vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y + 2);
 				fill(arrayToColor(cornerColors[3]));
-				vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+				vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y + 2);
 				fill(arrayToColor(cornerColors[2]));
-				vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+				vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y + 2);
 				endShape(CLOSE);
 
 				// fill(color(255));
@@ -1398,13 +1398,13 @@ class Lava extends Tile {
 			beginShape(TESS);
 			fill(arrayToColor(cornerColors[0]));
 			noStroke();
-			vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			vertex(this.x * GRID_SIZE_X, this.y * GRID_SIZE_Y + 2);
 			fill(arrayToColor(cornerColors[1]));
-			vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y);
+			vertex((this.x + 1) * GRID_SIZE_X, this.y * GRID_SIZE_Y + 2);
 			fill(arrayToColor(cornerColors[3]));
-			vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			vertex((this.x + 1) * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y + 2);
 			fill(arrayToColor(cornerColors[2]));
-			vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			vertex(this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y + 2);
 			endShape(CLOSE);
 
 			// fill(color(255));
