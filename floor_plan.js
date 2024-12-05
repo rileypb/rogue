@@ -3,7 +3,7 @@ function lerpArray(a, b, t) {
 }
 
 function arrayToColor(a) {
-	return color(a[0], a[1], a[2]);
+	return color(Math.max(0, Math.min(255, a[0])), Math.max(0, Math.min(255, a[1])), Math.max(0, Math.min(255, a[2])));
 }
 
 class Tile {
@@ -49,6 +49,14 @@ class Tile {
 
 	getLight() {
 		return this.light;
+	}
+
+	getColor() {
+		return this.light;
+	}
+
+	getBaseColor() {
+		return [0, 0, 0];
 	}
 
 	avoidOnPathfinding() {
@@ -210,6 +218,18 @@ class FloorPlan {
 			return [0,0,0];
 		}
 		let l = this.get(x, y).getLight();
+		let c = this.get(x, y).getBaseColor();
+		return [0.5 * l[0] + globalFlickerFactor + 0.5 * c[0], 0.5 * l[1] + globalFlickerFactor + 0.5 * c[1], 0.5 * l[2] + globalFlickerFactor + 0.5 * c[2]];
+	}
+
+	getColor2(x, y) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+			return [0,0,0];
+		}
+		if (!this.get(x, y).visible) {
+			return [0,0,0];
+		}
+		let l = this.get(x, y).getLight();
 		return [0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor];
 	}
 
@@ -267,6 +287,11 @@ class FloorPlan {
 			let isWater = Math.random() < 0.03;
 			let xPow = Math.floor(Math.random() * 3) + 2;
 			let yPow = Math.floor(Math.random() * 3) + 2;
+			let materialIndex = Math.floor(Math.random() * 5);
+
+			if (this.tiles[x + y * this.width] instanceof Floor) {
+				materialIndex = this.tiles[x + y * this.width].material;
+			}
 			for (let xx = x - dx; xx < x + dx; xx++) {
 				for (let yy = y - dy; yy < y + dy; yy++) {
 					if (xx < 1 || xx >= this.width - 1 || yy < 1 || yy >= this.height - 1) {
@@ -281,7 +306,29 @@ class FloorPlan {
 							} else if (isWater) {
 								this.tiles[xx + yy * this.width] = new Water(xx, yy, 1);
 							} else {
-								this.tiles[xx + yy * this.width] = new Floor(xx, yy);
+								switch (materialIndex) {
+									case 0:
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_DIRT);
+										break;
+									case 1:
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_GRASS);
+										break;
+									case 2:
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_TILE);
+										break;
+									case 3:
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_STONE);
+										break;
+									case 4:
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_WOOD);
+										break;
+									case 5: 
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_SAND);
+										break;
+									default:
+										this.tiles[xx + yy * this.width] = new Floor(xx, yy, FLOOR_MATERIAL_DIRT);
+								}
+
 							}
 						}
 					}
@@ -614,7 +661,7 @@ class Wall extends Tile {
 			resultingLight = color(139, 69, 19);
 		}
 
-		fill(this.light);
+		fill(arrayToColor(this.light));
 		stroke(this.light);
 		if (RENDER_MODE == LINE_OF_SIGHT) {
 			fill(255);
@@ -630,7 +677,7 @@ class Wall extends Tile {
 			stroke(MEMORY_LIGHT);
 		} else if (!symbol_only) {
 			this.drawDefaultBackground();
-			fill(this.light);
+			fill(arrayToColor(this.light));
 			stroke(this.light);
 		}
 		let char = '#';
@@ -665,13 +712,25 @@ function canSeePlayer(x, y) {
 	return true;
 }
 
+FLOOR_MATERIAL_STONE = 0;
+FLOOR_MATERIAL_WOOD = 1;
+FLOOR_MATERIAL_GRASS = 2;
+FLOOR_MATERIAL_DIRT = 3;
+FLOOR_MATERIAL_TILE = 4;
+FLOOR_MATERIAL_SAND = 5;
+
 class Floor extends Tile {
-	constructor(x, y) {
+	MATERIAL_COLORS = [ [0, 0, 0], [139, 69, 19], [0, 128, 0], [139, 69, 19], [192, 192, 192], [255, 255, 0] ];
+	MATERIAL_SYMBOLS = [ ['.', '.'], ['=', '='], ['"', '"'], ['.', '.'], ['.', '.'], ['.', '.'] ];
+
+	constructor(x, y, material) {
 		super(x, y);
+
+		this.material = material || FLOOR_MATERIAL_STONE;
 	}
 
 	render(asNeighbor=false, symbol_only=false) {
-		fill(this.light);
+		fill(arrayToColor(this.light));
 		stroke(this.light);
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
 			fill(255);
@@ -702,12 +761,17 @@ class Floor extends Tile {
 			this.drawDefaultBackground();
 
 			let c = color(this.light[0], this.light[1], this.light[2]);
-			fill(c);
+			fill(arrayToColor(c));
 			stroke(c);
 		}
 		if (!asNeighbor && this.hasBeenSeen) {
-			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			text(this.MATERIAL_SYMBOLS[this.material][(this.x + this.y) % 2], (this.x + 0.2) * GRID_SIZE_X, (this.y + 0.80) * GRID_SIZE_Y);
+			
 		}
+	}
+
+	getBaseColor() {
+		return this.MATERIAL_COLORS[this.material];
 	}
 
 	isEnterable() {
@@ -753,7 +817,7 @@ class Lamp extends Tile {
 
 	render(asNeighbor=false, symbol_only=false) {
 		this.updateFlickerFactor();
-		fill(this.getLight());
+		fill(arrayToColor(this.getLight()));
 		stroke(this.getLight());
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
 			fill(255);
@@ -770,7 +834,7 @@ class Lamp extends Tile {
 		} else if (!symbol_only) {
 			this.drawDefaultBackground();
 
-			fill(this.light);
+			fill(arrayToColor(this.light));
 			stroke(this.light);
 		}
 		if (!asNeighbor && this.hasBeenSeen) {
@@ -901,7 +965,7 @@ class Water extends Tile {
 		// this.lightSource.updateFlickerFactor();
 		let c = color(this.light[0], this.light[1], this.light[2]);
 		let ls = this.lightSource.getLight();
-		let lsc = color(ls[0], ls[1], ls[2]);
+		let lsc = arrayToColor(ls[0], ls[1], ls[2]);
 		// let useColor = lerpColor(lsc, c, 0.5);
 		// fill(useColor);
 		// stroke(useColor);
@@ -1028,8 +1092,8 @@ class Lava extends Tile {
 
 	constructor(x, y) {
 		super(x, y);
-		this.color = [48, 0, 0];
-		this.lightSource = new LightSource(this.color, 0.2);
+		this.color = [512, 0, 0];
+		this.lightSource = new LightSource([16, 16, 16], 0.2);
 	}
 
 	avoidOnPathfinding() {
@@ -1039,7 +1103,7 @@ class Lava extends Tile {
 
 	render(asNeighbor=false, symbol_only=false) {
 		// this.updateFlickerFactor();
-		fill(this.getLight());
+		fill(arrayToColor(this.getLight()));
 		stroke(this.getLight());
 		if (RENDER_MODE == LINE_OF_SIGHT && this.hasLineOfSight) {
 			fill(255);
@@ -1051,17 +1115,17 @@ class Lava extends Tile {
 			if (asNeighbor && !symbol_only) {
 				let f = gameState.currentFloor();
 				let colors = [
-					[ f.getColor(this.x - 1, this.y - 1, true), 
-						f.getColor(this.x, this.y - 1, true),
-						f.getColor(this.x + 1, this.y - 1, true)
+					[ f.getColor2(this.x - 1, this.y - 1, true), 
+						f.getColor2(this.x, this.y - 1, true),
+						f.getColor2(this.x + 1, this.y - 1, true)
 					],
-					[ f.getColor(this.x - 1, this.y, true),
-						f.getColor(this.x, this.y, true),
-						f.getColor(this.x + 1, this.y, true)
+					[ f.getColor2(this.x - 1, this.y, true),
+						f.getColor2(this.x, this.y, true),
+						f.getColor2(this.x + 1, this.y, true)
 					],
-					[ f.getColor(this.x - 1, this.y + 1, true),
-						f.getColor(this.x, this.y + 1, true),
-						f.getColor(this.x + 1, this.y + 1, true)
+					[ f.getColor2(this.x - 1, this.y + 1, true),
+						f.getColor2(this.x, this.y + 1, true),
+						f.getColor2(this.x + 1, this.y + 1, true)
 					]
 				];
 				let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
@@ -1093,17 +1157,17 @@ class Lava extends Tile {
 		} else if (!symbol_only) {
 			let f = gameState.currentFloor();
 			let colors = [
-				[ f.getColor(this.x - 1, this.y - 1, true), 
-					f.getColor(this.x, this.y - 1, true),
-					f.getColor(this.x + 1, this.y - 1, true)
+				[ f.getColor2(this.x - 1, this.y - 1, true), 
+					f.getColor2(this.x, this.y - 1, true),
+					f.getColor2(this.x + 1, this.y - 1, true)
 				],
-				[ f.getColor(this.x - 1, this.y, true),
-					f.getColor(this.x, this.y, true),
-					f.getColor(this.x + 1, this.y, true)
+				[ f.getColor2(this.x - 1, this.y, true),
+					f.getColor2(this.x, this.y, true),
+					f.getColor2(this.x + 1, this.y, true)
 				],
-				[ f.getColor(this.x - 1, this.y + 1, true),
-					f.getColor(this.x, this.y + 1, true),
-					f.getColor(this.x + 1, this.y + 1, true)
+				[ f.getColor2(this.x - 1, this.y + 1, true),
+					f.getColor2(this.x, this.y + 1, true),
+					f.getColor2(this.x + 1, this.y + 1, true)
 				]
 			];
 			let cornerColors = [ lerpArray(lerpArray(colors[0][0], colors[1][1], 0.5), lerpArray(colors[1][0], colors[0][1], 0.5), 0.5),
@@ -1146,7 +1210,6 @@ class Lava extends Tile {
 			noStroke();
 		}
 		text('~', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
-
 	}
 
 	isLit() {
@@ -1158,7 +1221,11 @@ class Lava extends Tile {
 	}
 
 	getLight() {
-		return this.light.map(x => x * this.lightSource.flickerFactor);
+		return this.color.map(x => x * this.lightSource.flickerFactor);
+	}
+
+	getColor() {
+		return this.color;
 	}
 
 	isEnterable() {
