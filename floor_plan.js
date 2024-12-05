@@ -299,7 +299,8 @@ class FloorPlan {
 					}
 					if ((xx - x) ** xPow / dx ** xPow + (yy - y) ** yPow / dy ** yPow < 1) {
 						if (Math.random() < 0.002) {
-							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [Math.random() * 128, Math.random() * 128, Math.random() * 128]);
+							let color = 192; // Math.random() * 64 + 64;
+							this.tiles[xx + yy * this.width] = new Lamp(xx, yy, [color, color, color]);
 						} else {
 							if (isLava) {
 								this.tiles[xx + yy * this.width] = new Lava(xx, yy);
