@@ -967,7 +967,7 @@ class Water extends Tile {
 			fill(color(255, 128, 128));
 			stroke(color(255, 128, 128));
 		} else if (this.hasBeenSeen && !this.visible) {
-			fill(0, 0, 128);
+			fill(0, 0, 192);
 			noStroke();
 		}
 		text('~', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
