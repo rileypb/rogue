@@ -1029,7 +1029,7 @@ class Lava extends Tile {
 	constructor(x, y) {
 		super(x, y);
 		this.color = [48, 0, 0];
-		this.lightSource = new LightSource(this.color, 0.2);
+		this.lightSource = new LightSource([16, 16, 16], 0.2);
 	}
 
 	avoidOnPathfinding() {
@@ -1158,7 +1158,7 @@ class Lava extends Tile {
 	}
 
 	getLight() {
-		return this.light.map(x => x * this.lightSource.flickerFactor);
+		return [255 * this.lightSource.flickerFactor, 0, 0];
 	}
 
 	isEnterable() {
