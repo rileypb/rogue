@@ -129,51 +129,54 @@ function drawCursor() {
 			let dy = nextTile.y - tile.y;
 			if (dx == 1 && dy == 0) {
 				// fill(0);
-				text('→', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('→', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == -1 && dy == 0) {
 				// fill(0);
-				text('←', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('←', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == 0 && dy == 1) {
 				// fill(0);
-				text('↓', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↓', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == 0 && dy == -1) {
 				// fill(0);
-				text('↑', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↑', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == 1 && dy == 1) {
 				// fill(0);
-				text('↘', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↘', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == -1 && dy == 1) {
 				// fill(0);
-				text('↙', (tile.x + 0.25) * GRID_SIZE_X, (tile.y +0.75) * GRID_SIZE_Y);
+				text('↙', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y +0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == 1 && dy == -1) {
 				// fill(0);
-				text('↗', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↗', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			} else if (dx == -1 && dy == -1) {
 				// fill(0);
-				text('↖', (tile.x + 0.25) * GRID_SIZE_X, (tile.y + 0.75) * GRID_SIZE_Y);
+				text('↖', (tile.x + 0.25) * GRID_SIZE_X - 3, (tile.y + 0.75) * GRID_SIZE_Y + 4);
 			}
 		}
 		if (localPath.length > 0) {
 			fill(255, 255, 255, 128);
-			ellipse((localPath[0].x+0.5) * GRID_SIZE_X, (localPath[0].y+0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+			ellipse((localPath[0].x+0.5) * GRID_SIZE_X - 2, (localPath[0].y+0.5) * GRID_SIZE_Y + 3, GRID_SIZE_X, GRID_SIZE_Y);
 			fill(0);
-			text('⌖', (localPath[0].x + 0) * GRID_SIZE_X, (localPath[0].y + 0.75) * GRID_SIZE_Y);
+			text('X', (localPath[0].x + 0) * GRID_SIZE_X + 1, (localPath[0].y + 0.75) * GRID_SIZE_Y + 5);
 		}
 	} else {
 		fill(255, 0, 0, 128);
 		stroke(0);
-		ellipse((x + 0.5) * GRID_SIZE_X, (y + 0.5) * GRID_SIZE_Y, GRID_SIZE_X, GRID_SIZE_Y);
+		ellipse((x + 0.5) * GRID_SIZE_X - 2, (y + 0.5) * GRID_SIZE_Y + 3, GRID_SIZE_X, GRID_SIZE_Y);
 		fill(0);
 		noStroke();
-		text('X', (x + 0.2) * GRID_SIZE_X, (y + 0.85) * GRID_SIZE_Y);
+		text('X', (x + 0) * GRID_SIZE_X + 1, (y + 0.75) * GRID_SIZE_Y + 5);
 	}
 	
 }
 
 function drawPlayer() {
+	fill(0);
+	stroke(0);
+	text('@', gameState.player.x * GRID_SIZE_X + 2, (gameState.player.y + 1) * GRID_SIZE_Y + 1);
 	fill(255);
 	stroke(255);
-	text('@', gameState.player.x * GRID_SIZE_X, (gameState.player.y + 1) * GRID_SIZE_Y);
+	text('@', gameState.player.x * GRID_SIZE_X + 1, (gameState.player.y + 1) * GRID_SIZE_Y + 0);
 }
 
 function drawEnemies() {

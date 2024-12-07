@@ -706,7 +706,7 @@ class Floor extends Tile {
 			stroke(c);
 		}
 		if (!asNeighbor && this.hasBeenSeen) {
-			text('.', this.x * GRID_SIZE_X, (this.y + 1) * GRID_SIZE_Y);
+			text('.', this.x * GRID_SIZE_X + 3, (this.y + 1) * GRID_SIZE_Y - 3);
 		}
 	}
 
