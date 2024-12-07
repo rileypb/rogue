@@ -783,7 +783,7 @@ class Lamp extends Tile {
 	}
 
 	getLight() {
-		return this.lightSource.getLight();
+		return this.light;
 	}
 
 	isEnterable() {
