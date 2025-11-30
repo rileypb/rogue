@@ -54,7 +54,7 @@ function preload() {
 	b612Mono = loadFont("B612Mono-Regular.ttf");
 }
 
-function setup() {
+async function setup() {
 	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
 	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
 
@@ -66,7 +66,7 @@ function setup() {
 	taskManager.addTask(inputTask);
 	autoMoveTask = new AutoMoveTask();
 	taskManager.addTask(autoMoveTask);
-	setupGameState(gameState);
+	await setupGameState(gameState);
 	// set up falloff values
 	for (let i = 0; i <= MAX_LIGHT_DISTANCE; i++) {
 		fallOffValues.push(LIGHT_FALL_OFF ** i);
@@ -78,13 +78,13 @@ function setup() {
 	render();
 }
 
-function setupGameState(gameState) {
+async function setupGameState(gameState) {
 	gameState.floors = [new FloorPlan(MAP_WIDTH, MAP_HEIGHT, 0)];
 	gameState.floorIndex = 0;
-	gameState.currentFloor().generate();
+	await gameState.currentFloor().generate();
 	gameState.player = new Player("The player");
-	gameState.player.x = Math.floor(Math.random() * MAP_WIDTH);
-	gameState.player.y = Math.floor(Math.random() * MAP_HEIGHT);
+	gameState.player.x =30; // Math.floor(Math.random() * MAP_WIDTH);
+	gameState.player.y =30; // Math.floor(Math.random() * MAP_HEIGHT);
 	while (!(gameState.currentFloor().get(gameState.player.x, gameState.player.y) instanceof Floor)) {
 		gameState.player.x = Math.floor(Math.random() * MAP_WIDTH);
 		gameState.player.y = Math.floor(Math.random() * MAP_HEIGHT);

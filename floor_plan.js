@@ -152,12 +152,15 @@ class FloorPlan {
 	MIX = 2;
 	ONE_ROOM = 3;
 	RANDOM_WALLS = 4;
+	PREMAPPED = 5;
 
 	constructor(width, height, floor) {
 		this.width = width;
 		this.height = height;
 		this.floor = floor;
 		this.tiles = new Array(width * height);
+		this.subwidth = width;
+		this.subheight = height;
 
 		for (let x = 0; x < width; x++) {
 			for (let y = 0; y < height; y++) {
@@ -165,7 +168,7 @@ class FloorPlan {
 			}
 		}
 		this.floorIndex = 0;
-		this.type = this.NATURAL;
+		this.type = this.PREMAPPED;
 
 		this.monsters = [];
 	}
@@ -219,7 +222,7 @@ class FloorPlan {
 		}
 	}
 
-	generate() {
+	async generate() {
 		switch (this.type) {
 			case this.NATURAL:
 				this.generateNatural();
@@ -236,9 +239,115 @@ class FloorPlan {
 			case this.RANDOM_WALLS:
 				this.generateRandomWalls();
 				break;
+			case this.PREMAPPED:
+				await this.generatePremapped();
+				break;
 		}
 		this.computeBevel();
 	}
+
+	async generatePremapped() {
+		this.currentMapFile = "testmap.dat";
+		let response = await fetch('maps/' + this.currentMapFile);
+		let text = await response.text(); 
+		text = this.readWidth(text);
+		text = this.readHeight(text);
+		text = this.consume("\n", text);
+		text = this.readMapData(text);
+	}
+
+	readWidth(text) {
+		this.subwidth = parseInt(text.substring(0, 2));
+		return text.substring(2);
+	}
+
+	readHeight(text) {
+		this.subheight = parseInt(text.substring(0, 2));
+		return text.substring(2);
+	}
+
+	consume(expected, text) {
+		if (text.charAt(0) != expected) {
+			throw new Error("Expected '" + expected + "' but found '" + text.charAt(0) + "'");
+		}
+		return text.substring(1);
+	}
+
+	readMapData(text) {
+		let newText;
+		let nextChar;
+		for (let y = 0; y < this.subheight; y++) {
+			for (let x = 0; x < this.subwidth; x++) {
+				[newText, nextChar] = this.getNext(text, true);
+				if (nextChar == "&") {
+					this.applyModifier(newText);
+				} else {
+					console.log("setting tile at", x, y, "to", nextChar);
+					this.setNewTileFromChar(nextChar, x, y);
+				}
+				text = newText;
+			}
+		}
+		return text;
+	}
+
+	setNewTileFromChar(char, x, y) {
+		let tile = null;
+		let actualX = this.width/2 - this.subwidth/2 + x;
+		let actualY = this.height/2 - this.subheight/2 + y;
+		switch (char) {
+			case ".":
+				tile = new Floor(actualX, actualY);
+				break;
+			case "#":
+				tile = new Wall(actualX, actualY);
+				break;
+			case "~":
+				tile = new Water(actualX, actualY, 1);
+				break;
+			case "^":
+				tile = new Lava(actualX, actualY);
+				break;
+			case "L":
+				tile = new Lamp(actualX, actualY, [255, 128, 0]);
+				break;
+			default:
+				tile = new Floor(actualX, actualY);
+		}
+		this.lastTile = tile;
+		this.set(tile.x, tile.y, tile);
+	}	
+
+	applyModifier(text) {
+		let newText, modifier = this.readUntil(";", text);
+		switch (modifier) {
+			case "special":
+				this.lastTile.isSpecial = true;
+				break;
+		}
+		return newText;
+	}
+
+	readUntil(stopChar, text) {
+		let result = "";
+		while (text.charAt(0) != stopChar) {
+			result += text.charAt(0);
+			text = text.substring(1);
+		}
+		return [result, text];
+	}
+
+	getNext(text, skipWhitespace = false) {
+		if (skipWhitespace) {
+			while (text.length > 0 && /\s/.test(text.charAt(0))) {
+				text = text.substring(1);
+			}
+		}
+		let char = text.charAt(0);
+		text = text.substring(1);
+		return [text, char];
+	}
+
 
 	generateNatural() {
 		// fill with wall tiles
@@ -1029,7 +1138,7 @@ class Lava extends Tile {
 	constructor(x, y) {
 		super(x, y);
 		this.color = [48, 0, 0];
-		this.lightSource = new LightSource([16, 16, 16], 0.2);
+		this.lightSource = new LightSource([24, 24, 24], 0.2);
 	}
 
 	avoidOnPathfinding() {
