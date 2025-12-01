@@ -171,6 +171,8 @@ class FloorPlan {
 		this.type = this.PREMAPPED;
 
 		this.monsters = [];
+
+		this.indoors = false;
 	}
 
 	computeBevel() {
@@ -250,10 +252,17 @@ class FloorPlan {
 		this.currentMapFile = "testmap.dat";
 		let response = await fetch('maps/' + this.currentMapFile);
 		let text = await response.text(); 
+		text = this.readIndoorOutdoor(text);
 		text = this.readWidth(text);
 		text = this.readHeight(text);
 		text = this.consume("\n", text);
 		text = this.readMapData(text);
+	}
+
+	readIndoorOutdoor(text) {
+		let indoorOutdoor = text.charAt(0);
+		this.indoors = (indoorOutdoor == "I");
+		return text.substring(1);
 	}
 
 	readWidth(text) {
