@@ -76,7 +76,10 @@ async function setup() {
 }
 
 async function setupGameState(gameState) {
-	worldlet = new Worldlet("init", WT_DUNGEON, FP_NONE, INDOOR_ENGINE);
+	// worldlet = new Worldlet("init", WT_OPEN_WORLD, FP_NONE, OUTDOOR_ENGINE, OUTDOOR_INPUT);
+	worldlet = new Worldlet("init", WT_DUNGEON, FP_NONE, INDOOR_ENGINE, INDOOR_INPUT);
+
+	await worldlet.init();
 	gameState.floors = await worldlet.generateFloors();
 	gameState.floorIndex = worldlet.initialFloor;
 	gameState.currentWorldlet = worldlet;
