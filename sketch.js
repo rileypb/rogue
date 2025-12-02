@@ -55,33 +55,32 @@ function preload() {
 }
 
 async function setup() {
-	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
-	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
-
-	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
-	cursor(CROSS);
-	textFont(b612Mono, GRID_SIZE_Y);
-
-	// taskManager.addTask(counterTask);
+	initDisplay();
+	
 	taskManager.addTask(inputTask);
 	autoMoveTask = new AutoMoveTask();
 	taskManager.addTask(autoMoveTask);
-	await setupGameState(gameState);
+
 	// set up falloff values
 	for (let i = 0; i <= MAX_LIGHT_DISTANCE; i++) {
 		fallOffValues.push(LIGHT_FALL_OFF ** i);
 	}
+
+	await setupGameState(gameState);
+
 	playerLightSource = new LightSource([192, 192, 192], 0.1);
 	gameState.player.calculateLineOfSight(gameState.currentFloor());
 	updateLight(gameState.currentFloor(), gameState.player);
 	gameState.player.calculateSight(gameState.currentFloor());
-	render();
+	display();
 }
 
 async function setupGameState(gameState) {
-	gameState.floors = [new FloorPlan(MAP_WIDTH, MAP_HEIGHT, 0)];
-	gameState.floorIndex = 0;
-	await gameState.currentFloor().generate();
+	worldlet = new Worldlet("init", WT_DUNGEON, FP_NONE, INDOOR_ENGINE);
+	gameState.floors = await worldlet.generateFloors();
+	gameState.floorIndex = worldlet.initialFloor;
+	gameState.currentWorldlet = worldlet;
+	displayEngine = worldlet.displayEngine;
 	gameState.player = new Player("The player");
 	gameState.player.x =30; // Math.floor(Math.random() * MAP_WIDTH);
 	gameState.player.y =30; // Math.floor(Math.random() * MAP_HEIGHT);
@@ -181,7 +180,7 @@ function draw() {
 		gameState.player.calculateLineOfSight(gameState.currentFloor());
 		updateLight(gameState.currentFloor(), gameState.player);
 		gameState.player.calculateSight(gameState.currentFloor());
-		render();
+		display();
 	}
 }
 

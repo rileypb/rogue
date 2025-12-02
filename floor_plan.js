@@ -168,7 +168,7 @@ class FloorPlan {
 			}
 		}
 		this.floorIndex = 0;
-		this.type = this.PREMAPPED;
+		this.type = this.NATURAL;
 
 		this.monsters = [];
 
