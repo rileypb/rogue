@@ -1,10 +1,10 @@
 
-	WT_OPEN_WORLD = 0;
-	WT_DUNGEON = 1;
-	WT_INIT = 2;
+WT_OPEN_WORLD = 0;
+WT_DUNGEON = 1;
+WT_INIT = 2;
 
-	FP_NONE = 0;
-	FP_CENTER = 1;
+FP_NONE = 0;
+FP_CENTER = 1;
 	
 class Worldlet {
 
