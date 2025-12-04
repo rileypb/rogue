@@ -37,6 +37,9 @@ class IndoorDisplayEngine extends TiledDisplayEngine {
 	}
 
 	display() {
+		gameState.player.calculateLineOfSight(gameState.currentFloor());
+		updateLight(gameState.currentFloor(), gameState.player);
+		gameState.player.calculateSight(gameState.currentFloor());
 		render();
 	}
 }
@@ -51,7 +54,12 @@ class OutdoorDisplayEngine extends TiledDisplayEngine {
 	}
 
 	display() {
-		
+		gameState.player.calculateLineOfSight(gameState.currentFloor());
+		subtractDaylight(gameState.currentFloor());
+		updateLight(gameState.currentFloor(), gameState.player);
+		updateDaylight(gameState.currentFloor());
+		gameState.player.calculateSight(gameState.currentFloor());
+		render();
 	}
 }
 

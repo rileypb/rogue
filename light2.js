@@ -48,6 +48,83 @@ function subtractLight(floorplan, lightSource) {
 	}
 }
 
+DAYLIGHT_COLOR = [100,100, 50];
+DAYLIGHT_CACHE = null;
+let daylightAngle = 0;
+
+function updateDaylight(floorplan) {
+	daylightAngle += 0.01;
+	if (daylightAngle > Math.PI && daylightAngle < 2*Math.PI) {
+		return;
+	}
+	else if (daylightAngle >= 2*Math.PI) {
+		daylightAngle = 0;
+	}
+	if (!DAYLIGHT_CACHE) {
+		DAYLIGHT_CACHE = new Array(MAP_WIDTH * MAP_HEIGHT);
+		for (let i = 0; i < DAYLIGHT_CACHE.length; i++) {
+			DAYLIGHT_CACHE[i] = [0,0,0];
+		}
+	}
+	let exposedToDaylight = new Array(MAP_WIDTH * MAP_HEIGHT);
+	for (let i = 0; i < exposedToDaylight.length; i++) {
+		exposedToDaylight[i] = true;
+	}
+	let daylightLength = int(2*Math.cos(daylightAngle) / Math.sin(daylightAngle));
+	for (let tile of floorplan.tiles) {
+		if (daylightLength >= 0) {
+			for (let l = 0; l < daylightLength + 1; l++) {
+				let x = tile.x + l;
+				let y = tile.y;
+				if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+					let t = floorplan.get(x, y);
+					if (!t.isTransparent()) {
+						exposedToDaylight[tile.x + tile.y * MAP_WIDTH] = false;
+						break;
+					}
+				}
+			}
+		} else {
+			for (let l = daylightLength; l <= 0; l++) {
+				let x = tile.x + l;
+				let y = tile.y;
+				if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+					let t = floorplan.get(x, y);
+					if (!t.isTransparent()) {
+						exposedToDaylight[tile.x + tile.y * MAP_WIDTH] = false;
+						break;
+					}
+				}
+			}
+		}
+
+	}
+	for (let tile of floorplan.tiles) {
+		if (exposedToDaylight[tile.x + tile.y * MAP_WIDTH]) {
+			tile.light[0] += DAYLIGHT_COLOR[0];
+			tile.light[1] += DAYLIGHT_COLOR[1];
+			tile.light[2] += DAYLIGHT_COLOR[2];
+			DAYLIGHT_CACHE[tile.x + tile.y * MAP_WIDTH] = [DAYLIGHT_COLOR[0], DAYLIGHT_COLOR[1], DAYLIGHT_COLOR[2]];
+		} else {
+			DAYLIGHT_CACHE[tile.x + tile.y * MAP_WIDTH] = [0,0,0];
+		}
+	}
+}
+
+function subtractDaylight(floorplan) {
+	if (!DAYLIGHT_CACHE) {
+		DAYLIGHT_CACHE = new Array(MAP_WIDTH * MAP_HEIGHT);
+		for (let i = 0; i < DAYLIGHT_CACHE.length; i++) {
+			DAYLIGHT_CACHE[i] = [0,0,0];
+		}
+	}
+	for (let tile of floorplan.tiles) {
+		tile.light[0] -= DAYLIGHT_CACHE[tile.x + tile.y * MAP_WIDTH][0];
+		tile.light[1] -= DAYLIGHT_CACHE[tile.x + tile.y * MAP_WIDTH][1];
+		tile.light[2] -= DAYLIGHT_CACHE[tile.x + tile.y * MAP_WIDTH][2];
+	}
+}
+
 function updateLight(floorplan, player, refreshAll = false) {
 	let allLightSources = [];
 	// cast player's torchlight
