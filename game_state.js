@@ -4,6 +4,7 @@ class GameState {
 		this.floors = [];
 		this.floorIndex = 0;
 		this.monsters = [];
+		this.currentWorldlet = null;
 	}
 
 	currentFloor() {

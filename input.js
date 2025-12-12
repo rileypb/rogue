@@ -194,7 +194,7 @@ class AutoMoveTask extends Task {
 					gameState.player.calculateLineOfSight(gameState.currentFloor());
 					updateLight(gameState.currentFloor(), gameState.player);
 					gameState.player.calculateSight(gameState.currentFloor());
-					render();
+					display();
 					if (this.path.length > 0) {
 						this.path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, this.path[0].x, this.path[0].y);
 					}

@@ -204,13 +204,15 @@ class FloorPlan {
 	MIX = 2;
 	ONE_ROOM = 3;
 	RANDOM_WALLS = 4;
-	CASTLE = 5;
+	PREMAPPED = 5;
 
 	constructor(width, height, floor) {
 		this.width = width;
 		this.height = height;
 		this.floor = floor;
 		this.tiles = new Array(width * height);
+		this.subwidth = width;
+		this.subheight = height;
 
 		for (let x = 0; x < width; x++) {
 			for (let y = 0; y < height; y++) {
@@ -221,6 +223,8 @@ class FloorPlan {
 		this.type = this.NATURAL;
 
 		this.monsters = [];
+
+		this.indoors = false;
 	}
 
 	get(x, y) {
@@ -363,7 +367,7 @@ class FloorPlan {
 		}
 	}
 
-	generate() {
+	async generate() {
 		switch (this.type) {
 			case this.NATURAL:
 				this.generateNatural();
@@ -380,11 +384,121 @@ class FloorPlan {
 			case this.RANDOM_WALLS:
 				this.generateRandomWalls();
 				break;
-			case this.CASTLE:
-				generateCastle(this);
+			case this.PREMAPPED:
+				await this.generatePremapped();
 				break;
 		}
 	}
+
+	async generatePremapped() {
+		this.currentMapFile = "testmap.dat";
+		let response = await fetch('maps/' + this.currentMapFile);
+		let text = await response.text(); 
+		text = this.readIndoorOutdoor(text);
+		text = this.readWidth(text);
+		text = this.readHeight(text);
+		text = this.consume("\n", text);
+		text = this.readMapData(text);
+	}
+
+	readIndoorOutdoor(text) {
+		let indoorOutdoor = text.charAt(0);
+		this.indoors = (indoorOutdoor == "I");
+		return text.substring(1);
+	}
+
+	readWidth(text) {
+		this.subwidth = parseInt(text.substring(0, 2));
+		return text.substring(2);
+	}
+
+	readHeight(text) {
+		this.subheight = parseInt(text.substring(0, 2));
+		return text.substring(2);
+	}
+
+	consume(expected, text) {
+		if (text.charAt(0) != expected) {
+			throw new Error("Expected '" + expected + "' but found '" + text.charAt(0) + "'");
+		}
+		return text.substring(1);
+	}
+
+	readMapData(text) {
+		let newText;
+		let nextChar;
+		for (let y = 0; y < this.subheight; y++) {
+			for (let x = 0; x < this.subwidth; x++) {
+				[newText, nextChar] = this.getNext(text, true);
+				if (nextChar == "&") {
+					this.applyModifier(newText);
+				} else {
+					console.log("setting tile at", x, y, "to", nextChar);
+					this.setNewTileFromChar(nextChar, x, y);
+				}
+				text = newText;
+			}
+		}
+		return text;
+	}
+
+	setNewTileFromChar(char, x, y) {
+		let tile = null;
+		let actualX = this.width/2 - this.subwidth/2 + x;
+		let actualY = this.height/2 - this.subheight/2 + y;
+		switch (char) {
+			case ".":
+				tile = new Floor(actualX, actualY);
+				break;
+			case "#":
+				tile = new Wall(actualX, actualY);
+				break;
+			case "~":
+				tile = new Water(actualX, actualY, 1);
+				break;
+			case "^":
+				tile = new Lava(actualX, actualY);
+				break;
+			case "L":
+				tile = new Lamp(actualX, actualY, [255, 128, 0]);
+				break;
+			default:
+				tile = new Floor(actualX, actualY);
+		}
+		this.lastTile = tile;
+		this.set(tile.x, tile.y, tile);
+	}	
+
+	applyModifier(text) {
+		let newText, modifier = this.readUntil(";", text);
+		switch (modifier) {
+			case "special":
+				this.lastTile.isSpecial = true;
+				break;
+		}
+		return newText;
+	}
+
+	readUntil(stopChar, text) {
+		let result = "";
+		while (text.charAt(0) != stopChar) {
+			result += text.charAt(0);
+			text = text.substring(1);
+		}
+		return [result, text];
+	}
+
+	getNext(text, skipWhitespace = false) {
+		if (skipWhitespace) {
+			while (text.length > 0 && /\s/.test(text.charAt(0))) {
+				text = text.substring(1);
+			}
+		}
+		let char = text.charAt(0);
+		text = text.substring(1);
+		return [text, char];
+	}
+
 
 	generateNatural() {
 		// fill with wall tiles
@@ -894,16 +1008,8 @@ class Floor extends Tile {
 			let c = color(this.light);
 			fill(0);
 		}
-		 if (!asNeighbor && this.hasBeenSeen) {
-			if ((this.material == FLOOR_MATERIAL_TILE || this.material == FLOOR_MATERIAL_TILE_2) && this.visible) {
-				stroke(192);
-				noFill();
-				rect(this.x * GRID_SIZE_X + 2 - 2, this.y * GRID_SIZE_Y + 2 + 1, GRID_SIZE_X - 2, GRID_SIZE_Y - 2);
-				stroke(128);
-				rect(this.x * GRID_SIZE_X + 1 - 2, this.y * GRID_SIZE_Y + 1 + 1, GRID_SIZE_X - 1, GRID_SIZE_Y - 1);
-			} else {
-				text(this.MATERIAL_SYMBOLS[this.material][(this.x + this.y) % 2], (this.x + 0.2) * GRID_SIZE_X, (this.y + 0.80) * GRID_SIZE_Y);
-			}
+		if (!asNeighbor && this.hasBeenSeen) {
+			text('.', this.x * GRID_SIZE_X + 3, (this.y + 1) * GRID_SIZE_Y - 3);
 		}
 	}
 
@@ -1050,7 +1156,7 @@ class Lamp extends Tile {
 	}
 
 	getLight() {
-		return this.lightSource.getLight();
+		return this.light;
 	}
 
 	isEnterable() {
@@ -1238,7 +1344,7 @@ class Water extends Tile {
 			fill(color(255, 128, 128));
 			stroke(color(255, 128, 128));
 		} else if (this.hasBeenSeen && !this.visible) {
-			fill(0, 0, 128);
+			fill(0, 0, 192);
 			noStroke();
 		}
 		if (!this.visible) {
@@ -1307,12 +1413,8 @@ class Lava extends Tile {
 
 	constructor(x, y) {
 		super(x, y);
-		this.color = 192;
-		this.lightSource = new LightSource(32, 0.2);
-	}
-
-	getDescription() {
-		return 'lava';
+		this.color = [48, 0, 0];
+		this.lightSource = new LightSource([24, 24, 24], 0.2);
 	}
 
 	avoidOnPathfinding() {
@@ -1442,11 +1544,7 @@ class Lava extends Tile {
 	}
 
 	getLight() {
-		return this.color * this.lightSource.flickerFactor;
-	}
-
-	getColor() {
-		return this.color;
+		return [255 * this.lightSource.flickerFactor, 0, 0];
 	}
 
 	isEnterable() {
