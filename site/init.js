@@ -1,8 +1,8 @@
 function initDisplay() {
-	CANVAS_WIDTH = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
-	CANVAS_HEIGHT = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
+	game.camera.canvasWidth = Math.min(GRID_SIZE_X * MAP_WIDTH, windowWidth);
+	game.camera.canvasHeight = Math.min(GRID_SIZE_Y * MAP_HEIGHT, windowHeight);
 
-	createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT, WEBGL);
+	createCanvas(game.camera.canvasWidth, game.camera.canvasHeight, WEBGL);
 	cursor(CROSS);
-	textFont(b612Mono, GRID_SIZE_Y);
+	textFont(game.fonts.b612Mono, GRID_SIZE_Y);
 }

@@ -1,22 +1,10 @@
 
-let displayEngine;
-let displayedWorldlet;
-
 function display() {
-	if (displayEngine) {
-		displayEngine.display();
+	if (game.displayEngine) {
+		game.displayEngine.display();
 	} else {
 		// do something else by default
 	}
-}
-
-function setDisplayedWorldlet(worldlet) {
-	if (displayEngine) {
-		displayEngine.teardown();
-	}
-	displayedWorldlet = worldlet;
-	displayEngine = worldlet.displayEngine;
-	displayEngine.init();
 }
 
 class DisplayEngine {

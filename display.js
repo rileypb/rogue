@@ -1,11 +1,9 @@
 
-BACKGROUND_COLOR = [20, 20, 40];
-
 function render() {
 	background(BACKGROUND_COLOR);
 	resetMatrix();
-	// translate(-drawLeft, -drawTop);
-	translate(-drawLeft-CANVAS_WIDTH/2, -drawTop-CANVAS_HEIGHT/2);	
+	// translate(-game.camera.left, -game.camera.top);
+	translate(-game.camera.left-game.camera.canvasWidth/2, -game.camera.top-game.camera.canvasHeight/2);	
 	drawFloorPlan();
 	drawEnemies();
 	drawPlayer();
@@ -13,19 +11,19 @@ function render() {
 }
 
 function drawFloorPlan() {
-	let fp = gameState.currentFloor();
+	let fp = game.state.currentFloor();
 	let floorPlan = fp.tiles;
 	for (let tile of floorPlan) {
 		tile.rendered = false;
 	}
 	allRenderedNeighbors = [];
 	for (let tile of floorPlan) {
-		if (tile.visible || ((RENDER_MODE == LINE_OF_SIGHT || RENDER_MODE == LINE_OF_SIGHT_PLUS) && tile.hasLineOfSight) || tile.hasBeenSeen) {
+		if (tile.visible || ((game.renderMode == LINE_OF_SIGHT || game.renderMode == LINE_OF_SIGHT_PLUS) && tile.hasLineOfSight) || tile.hasBeenSeen) {
 			tileRenderer.renderTile(tile, fp);
 			if (tile.visible) {
 				tile.rendered = true;
 			}
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			tileRenderer.renderTile(tile, fp);
 			tile.rendered = true;
 		} 
@@ -102,13 +100,13 @@ function drawFloorPlan() {
 function drawCursor() {
 	fill(255, 255, 255, 64);
 	stroke(255, 255, 255, 64);
-	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
-	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
-	if (autoMoveTask.autoMoveInProgress && path && path.length > 0) {
-		x = path[0].x;
-		y = path[0].y;
+	let x = Math.floor((mouseX + game.camera.left) / GRID_SIZE_X);
+	let y = Math.floor((mouseY + game.camera.top) / GRID_SIZE_Y);
+	if (game.autoMoveTask.autoMoveInProgress && game.currentPath && game.currentPath.length > 0) {
+		x = game.currentPath[0].x;
+		y = game.currentPath[0].y;
 	}
-	let localPath = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
+	let localPath = findPath(game.state.currentFloor(), game.state.player.x, game.state.player.y, x, y);
 	if (localPath) {
 		noStroke();
 		for (let i = localPath.length - 1; i > 0; i--) {
@@ -164,14 +162,14 @@ function drawCursor() {
 function drawPlayer() {
 	fill(0);
 	stroke(0);
-	text('@', gameState.player.x * GRID_SIZE_X + 2, (gameState.player.y + 1) * GRID_SIZE_Y + 1);
+	text('@', game.state.player.x * GRID_SIZE_X + 2, (game.state.player.y + 1) * GRID_SIZE_Y + 1);
 	fill(255);
 	stroke(255);
-	text('@', gameState.player.x * GRID_SIZE_X + 1, (gameState.player.y + 1) * GRID_SIZE_Y + 0);
+	text('@', game.state.player.x * GRID_SIZE_X + 1, (game.state.player.y + 1) * GRID_SIZE_Y + 0);
 }
 
 function drawEnemies() {
-	let fp = gameState.currentFloor();
+	let fp = game.state.currentFloor();
 	for (let monster of fp.monsters) {
 		let tile = fp.get(monster.x, monster.y);
 		if (tile.visible) {

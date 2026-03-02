@@ -69,10 +69,10 @@ class TileRenderer {
 
 		fill(tile.light);
 		stroke(tile.light);
-		if (RENDER_MODE == LINE_OF_SIGHT) {
+		if (game.renderMode == LINE_OF_SIGHT) {
 			fill(255);
 			stroke(255);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (tile.hasBeenSeen && !tile.visible) {
@@ -96,13 +96,13 @@ class TileRenderer {
 	renderFloor(tile, floorPlan, asNeighbor, symbolOnly) {
 		fill(tile.light);
 		stroke(tile.light);
-		if (RENDER_MODE == LINE_OF_SIGHT && tile.hasLineOfSight) {
+		if (game.renderMode == LINE_OF_SIGHT && tile.hasLineOfSight) {
 			fill(255);
 			stroke(255);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
-		} else if (RENDER_MODE == RECIPROCAL_LINE_OF_SIGHT) {
+		} else if (game.renderMode == RECIPROCAL_LINE_OF_SIGHT) {
 			if (tile.hasLineOfSight) {
 				fill(255);
 				stroke(255);
@@ -137,10 +137,10 @@ class TileRenderer {
 		tile.updateFlickerFactor();
 		fill(tile.getLight());
 		stroke(tile.getLight());
-		if (RENDER_MODE == LINE_OF_SIGHT && tile.hasLineOfSight) {
+		if (game.renderMode == LINE_OF_SIGHT && tile.hasLineOfSight) {
 			fill(255);
 			stroke(255);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (tile.hasBeenSeen && !tile.visible) {
@@ -168,10 +168,10 @@ class TileRenderer {
 		// let useColor = lerpColor(lsc, c, 0.5);
 		// fill(useColor);
 		// stroke(useColor);
-		if (RENDER_MODE == LINE_OF_SIGHT && tile.hasLineOfSight) {
+		if (game.renderMode == LINE_OF_SIGHT && tile.hasLineOfSight) {
 			fill(255);
 			stroke(255);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (tile.hasBeenSeen && !tile.visible) {
@@ -187,10 +187,10 @@ class TileRenderer {
 		let tildeColor = lerpColor(lsc, color(0, 0, 64), 0.75);
 		fill(tildeColor);
 		stroke(tildeColor);
-		if (RENDER_MODE == LINE_OF_SIGHT && tile.hasLineOfSight) {
+		if (game.renderMode == LINE_OF_SIGHT && tile.hasLineOfSight) {
 			fill(128);
 			stroke(128);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 128, 128));
 			stroke(color(255, 128, 128));
 		} else if (tile.hasBeenSeen && !tile.visible) {
@@ -204,10 +204,10 @@ class TileRenderer {
 		// this.updateFlickerFactor();
 		fill(tile.getLight());
 		stroke(tile.getLight());
-		if (RENDER_MODE == LINE_OF_SIGHT && tile.hasLineOfSight) {
+		if (game.renderMode == LINE_OF_SIGHT && tile.hasLineOfSight) {
 			fill(255);
 			stroke(255);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 200, 200));
 			stroke(color(255, 200, 200));
 		} else if (tile.hasBeenSeen && !tile.visible) {
@@ -226,10 +226,10 @@ class TileRenderer {
 		let caretColor = lerpColor(c, color(64, 0, 0), 0.75);
 		fill(caretColor);
 		stroke(caretColor);
-		if (RENDER_MODE == LINE_OF_SIGHT && tile.hasLineOfSight) {
+		if (game.renderMode == LINE_OF_SIGHT && tile.hasLineOfSight) {
 			fill(128);
 			stroke(128);
-		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
+		} else if (game.renderMode == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
 			fill(color(255, 128, 128));
 			stroke(color(255, 128, 128));
 		} else if (tile.hasBeenSeen && !tile.visible) {

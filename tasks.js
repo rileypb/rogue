@@ -65,10 +65,10 @@ class FlickerTask extends Task {
   }
 
   run() {
-	globalFlickerFactor = Math.random() * 6 - 3;
+	game.flickerFactor = Math.random() * 6 - 3;
 	this.floorPlan.updateFlicker();
-	playerLightSource.updateFlickerFactor();
-	updateLight(this.floorPlan, gameState.player);
+	game.playerLightSource.updateFlickerFactor();
+	updateLight(this.floorPlan, game.state.player);
 	display();
 	this.countdown = Math.floor(Math.random() * 30 + 1);
 	return 0;

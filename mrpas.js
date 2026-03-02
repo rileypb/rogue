@@ -4,9 +4,9 @@
 
 function createMRPASVisibility(){
     return new MRPAS(
-        (x,y) => { return !gameState.currentFloor().get(x, y).isTransparent(); },
-        (x,y) => { gameState.currentFloor().get(x, y).hasLineOfSight = true; },
-        (x,y) => { return gameState.currentFloor().get(x, y).hasLineOfSight; },
+        (x,y) => { return !game.state.currentFloor().get(x, y).isTransparent(); },
+        (x,y) => { game.state.currentFloor().get(x, y).hasLineOfSight = true; },
+        (x,y) => { return game.state.currentFloor().get(x, y).hasLineOfSight; },
         (x,y) => { return Math.sqrt(x ** 2 + y ** 2); }
     );
 }

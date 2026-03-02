@@ -1,12 +1,3 @@
-const LIGHT_FALL_OFF = 0.85;
-const LIGHT_THRESHOLD = 129;
-const MAX_LIGHT_DISTANCE = 20;
-const MEMORY_LIGHT = [50, 50, 100];
-
-let globalFlickerFactor = 0;
-
-let fallOffValues = [];
-
 class LightSource {
 	constructor(color, flicker) {
 		this.color = color;
@@ -36,8 +27,6 @@ class LightSource {
 
 }
 
-let playerLightSource;
-
 function subtractLight(floorplan, lightSource) {
 	for (let tile of floorplan.tiles) {
 		if (tile && tile.isTransparent()) {
@@ -51,9 +40,9 @@ function subtractLight(floorplan, lightSource) {
 function updateLight(floorplan, player, refreshAll = false) {
 	let allLightSources = [];
 	// cast player's torchlight
-	subtractLight(floorplan, playerLightSource);
-	updateLightFromPosition(floorplan, player.x, player.y, playerLightSource);
-	allLightSources.push(playerLightSource);
+	subtractLight(floorplan, game.playerLightSource);
+	updateLightFromPosition(floorplan, player.x, player.y, game.playerLightSource);
+	allLightSources.push(game.playerLightSource);
 
 	// for each lamp, cast light
 	for (let tile of floorplan.tiles) {
@@ -67,7 +56,7 @@ function updateLight(floorplan, player, refreshAll = false) {
 		}
 	}
 
-	for (let monster of gameState.currentFloor().monsters) {
+	for (let monster of game.state.currentFloor().monsters) {
 		if (monster.lightSource) {
 			allLightSources.push(monster.lightSource);
 			if (refreshAll || monster.lightSource.isDirty) {
@@ -112,8 +101,8 @@ function updateLight(floorplan, player, refreshAll = false) {
 				}					
 				// tile.light = neighborTile.light;
 				// break;
-				let d1 = (neighborTile.x - gameState.player.x) ** 2 + (neighborTile.y - gameState.player.y) ** 2;
-				let d2 = (tile.x - gameState.player.x) ** 2 + (tile.y - gameState.player.y) ** 2;
+				let d1 = (neighborTile.x - game.state.player.x) ** 2 + (neighborTile.y - game.state.player.y) ** 2;
+				let d2 = (tile.x - game.state.player.x) ** 2 + (tile.y - game.state.player.y) ** 2;
 				if (d1 < d2) {
 					red += neighborTile.light[0];
 					green += neighborTile.light[1];
@@ -153,11 +142,11 @@ function updateLightFromPosition(floorplan, lightX, lightY, lightSource) {
 				let r = light[0];
 				let g = light[1];
 				let b = light[2];
-				lightSource.cache[x + y * MAP_WIDTH] = [r * fallOffValues[distance], g * fallOffValues[distance], b * fallOffValues[distance]];
+				lightSource.cache[x + y * MAP_WIDTH] = [r * game.fallOffValues[distance], g * game.fallOffValues[distance], b * game.fallOffValues[distance]];
 				let tile = floorplan.get(x, y);
-				tile.light[0] += r * fallOffValues[distance];
-				tile.light[1] += g * fallOffValues[distance];
-				tile.light[2] += b * fallOffValues[distance];
+				tile.light[0] += r * game.fallOffValues[distance];
+				tile.light[1] += g * game.fallOffValues[distance];
+				tile.light[2] += b * game.fallOffValues[distance];
 			}
 		}
 	}

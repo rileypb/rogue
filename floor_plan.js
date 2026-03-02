@@ -172,7 +172,7 @@ class FloorPlan {
 			return [0,0,0];
 		}
 		let l = this.get(x, y).getLight();
-		return [0.5 * l[0] + globalFlickerFactor, 0.5 * l[1] + globalFlickerFactor, 0.5 * l[2] + globalFlickerFactor];
+		return [0.5 * l[0] + game.flickerFactor, 0.5 * l[1] + game.flickerFactor, 0.5 * l[2] + game.flickerFactor];
 	}
 
 	updateFlicker() {
@@ -686,8 +686,8 @@ class Wall extends Tile {
 }
 
 function canSeePlayer(x, y) {
-	let dx = gameState.player.x - x;
-	let dy = gameState.player.y - y;
+	let dx = game.state.player.x - x;
+	let dy = game.state.player.y - y;
 	let distance = Math.sqrt(dx ** 2 + dy ** 2);
 	let angle = Math.atan2(dy, dx);
 	for (let i = 0; i < distance; i++) {
@@ -699,10 +699,10 @@ function canSeePlayer(x, y) {
 		if (dy < 0) {
 			yy = Math.ceil(y + i * Math.sin(angle));
 		}
-		if (xx < 0 || xx >= gameState.currentFloor().width || yy < 0 || yy >= gameState.currentFloor().height) {
+		if (xx < 0 || xx >= game.state.currentFloor().width || yy < 0 || yy >= game.state.currentFloor().height) {
 			return false;
 		}
-		if (!gameState.currentFloor().get(xx, yy).isTransparent()) {
+		if (!game.state.currentFloor().get(xx, yy).isTransparent()) {
 			return false;
 		}
 	}

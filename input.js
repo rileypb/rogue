@@ -42,8 +42,6 @@ class InputTask extends Task {
 	}
 }
 
-let path = null;
-
 let touchesCache = [];
 
 function touchStarted() {
@@ -57,19 +55,19 @@ function touchMoved() {
 function touchEnded() {
 	if (touchesCache.length == 1) {
 		for (let touch of touchesCache) {
-			let x = Math.floor((touch.x + drawLeft) / GRID_SIZE_X);
-			let y = Math.floor((touch.y + drawTop) / GRID_SIZE_Y);
-			let targetTile = gameState.currentFloor().get(x, y);
+			let x = Math.floor((touch.x + game.camera.left) / GRID_SIZE_X);
+			let y = Math.floor((touch.y + game.camera.top) / GRID_SIZE_Y);
+			let targetTile = game.state.currentFloor().get(x, y);
 			if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
 				return;
 			}
-			path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
-			if (!path) {
+			game.currentPath = findPath(game.state.currentFloor(), game.state.player.x, game.state.player.y, x, y);
+			if (!game.currentPath) {
 				return;
 			}
-			if (path.length > 0) {
-				autoMoveTask.path = path;
-				autoMoveTask.autoMoveInProgress = true;
+			if (game.currentPath.length > 0) {
+				game.autoMoveTask.path = game.currentPath;
+				game.autoMoveTask.autoMoveInProgress = true;
 			}
 		}
 	}
@@ -77,19 +75,19 @@ function touchEnded() {
 }
 
 function mouseReleased() {
-	let x = Math.floor((mouseX + drawLeft) / GRID_SIZE_X);
-	let y = Math.floor((mouseY + drawTop) / GRID_SIZE_Y);
-	let targetTile = gameState.currentFloor().get(x, y);
+	let x = Math.floor((mouseX + game.camera.left) / GRID_SIZE_X);
+	let y = Math.floor((mouseY + game.camera.top) / GRID_SIZE_Y);
+	let targetTile = game.state.currentFloor().get(x, y);
 	if (!targetTile || (!targetTile.isEnterable() && targetTile.hasBeenSeen)) {
 		return;
 	}
-	path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, x, y);
-	if (!path) {
+	game.currentPath = findPath(game.state.currentFloor(), game.state.player.x, game.state.player.y, x, y);
+	if (!game.currentPath) {
 		return;
 	}
-	if (path.length > 0) {
-		autoMoveTask.path = path;
-		autoMoveTask.autoMoveInProgress = true;
+	if (game.currentPath.length > 0) {
+		game.autoMoveTask.path = game.currentPath;
+		game.autoMoveTask.autoMoveInProgress = true;
 	}
 }
 
@@ -180,12 +178,12 @@ class AutoMoveTask extends Task {
 			}
 			if (this.path.length > 0) {
 				let move = this.path.pop();
-				let dx = move.x - gameState.player.x;
-				let dy = move.y - gameState.player.y;
+				let dx = move.x - game.state.player.x;
+				let dy = move.y - game.state.player.y;
 				let command = new MoveCommand(dx, dy);
-				if (executeTurn(command, gameState.player, gameState)) {
+				if (executeTurn(command, game.state.player, game.state)) {
 					if (this.path.length > 0) {
-						this.path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, this.path[0].x, this.path[0].y);
+						this.path = findPath(game.state.currentFloor(), game.state.player.x, game.state.player.y, this.path[0].x, this.path[0].y);
 					}
 				}
 				else {
