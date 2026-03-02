@@ -132,6 +132,12 @@ class Player {
 			this.x = newX;
 			this.y = newY;
 			newTile.onEnter(this);
+			// Kill any monster on this tile
+			for (let monster of floorPlan.monsters) {
+				if (monster.x === newX && monster.y === newY) {
+					monster.health = 0;
+				}
+			}
 			return true;
 		}
 		return false;

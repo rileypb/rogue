@@ -80,8 +80,29 @@ function executeTurn(command, actor, state) {
  */
 function endTurn(state) {
 	let floor = state.currentFloor();
+	// Compute player LOS first so monsters can use it for awareness
 	state.player.calculateLineOfSight(floor);
+	// All monsters act (using current LOS)
+	for (let monster of floor.monsters) {
+		monster.act(floor);
+	}
+	// Remove dead monsters
+	floor.monsters = floor.monsters.filter(m => m.health > 0);
 	updateLight(floor, state.player);
 	state.player.calculateSight(floor);
+	// Cancel auto-move if a monster newly came into view
+	if (game.autoMoveTask.autoMoveInProgress) {
+		for (let monster of floor.monsters) {
+			let tile = floor.get(monster.x, monster.y);
+			if (tile.visible && !monster.wasVisible) {
+				game.autoMoveTask.autoMoveInProgress = false;
+				break;
+			}
+		}
+	}
+	// Update visibility tracking for all monsters
+	for (let monster of floor.monsters) {
+		monster.wasVisible = floor.get(monster.x, monster.y).visible;
+	}
 	display();
 }
