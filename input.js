@@ -182,11 +182,8 @@ class AutoMoveTask extends Task {
 				let move = this.path.pop();
 				let dx = move.x - gameState.player.x;
 				let dy = move.y - gameState.player.y;
-				if (gameState.player.move(dx, dy, gameState.currentFloor())) {
-					gameState.player.calculateLineOfSight(gameState.currentFloor());
-					updateLight(gameState.currentFloor(), gameState.player);
-					gameState.player.calculateSight(gameState.currentFloor());
-					display();
+				let command = new MoveCommand(dx, dy);
+				if (executeTurn(command, gameState.player, gameState)) {
 					if (this.path.length > 0) {
 						this.path = findPath(gameState.currentFloor(), gameState.player.x, gameState.player.y, this.path[0].x, this.path[0].y);
 					}

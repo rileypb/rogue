@@ -56,6 +56,7 @@ function preload() {
 
 async function setup() {
 	initDisplay();
+	initKeyBindings();
 	
 	taskManager.addTask(inputTask);
 	autoMoveTask = new AutoMoveTask();
@@ -69,10 +70,7 @@ async function setup() {
 	await setupGameState(gameState);
 
 	playerLightSource = new LightSource([192, 192, 192], 0.1);
-	gameState.player.calculateLineOfSight(gameState.currentFloor());
-	updateLight(gameState.currentFloor(), gameState.player);
-	gameState.player.calculateSight(gameState.currentFloor());
-	display();
+	endTurn(gameState);
 }
 
 async function setupGameState(gameState) {
@@ -151,39 +149,10 @@ function draw() {
 	// text(counterTask.count, 100, 100);
 	let moveKey = inputTask.emittedKeyCode;
 	if (moveKey) {
-		switch (moveKey) {
-			case Q:
-				gameState.player.move(-1, -1, gameState.currentFloor());
-				break;
-			case W:
-				gameState.player.move(0, -1, gameState.currentFloor());
-				break;
-			case E:
-				gameState.player.move(1, -1, gameState.currentFloor());
-				break;
-			case A:
-				gameState.player.move(-1, 0, gameState.currentFloor());
-				break;
-			case S:
-				gameState.player.move(0, 0, gameState.currentFloor());
-				break;
-			case D:
-				gameState.player.move(1, 0, gameState.currentFloor());
-				break;
-			case Z:
-				gameState.player.move(-1, 1, gameState.currentFloor());
-				break;
-			case X:
-				gameState.player.move(0, 1, gameState.currentFloor());
-				break;
-			case C:
-				gameState.player.move(1, 1, gameState.currentFloor());
-				break;
+		let command = resolveInput(moveKey);
+		if (command) {
+			executeTurn(command, gameState.player, gameState);
 		}
-		gameState.player.calculateLineOfSight(gameState.currentFloor());
-		updateLight(gameState.currentFloor(), gameState.player);
-		gameState.player.calculateSight(gameState.currentFloor());
-		display();
 	}
 }
 
