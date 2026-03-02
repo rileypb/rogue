@@ -32,7 +32,7 @@ async function setupGameState(state) {
 	game.worldlet = new Worldlet("init", WT_DUNGEON, FP_NONE, INDOOR_ENGINE, INDOOR_INPUT);
 
 	await game.worldlet.init();
-	state.floors = await game.worldlet.generateFloors();
+	state.floors = game.worldlet.floors;
 	state.floorIndex = game.worldlet.initialFloor;
 	state.currentWorldlet = game.worldlet;
 	game.displayEngine = game.worldlet.displayEngine;

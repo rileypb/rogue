@@ -288,7 +288,7 @@ class AdamMilVisibility extends Visibility {
 	}
 
 	compute(origin, rangeLimit) {
-		this.fnSetVisible(origin.X, origin.Y);
+		this.fnSetVisible(origin.x, origin.y);
 		for (let octant = 0; octant < 8; octant++) {
 			this.computeOctant(octant, origin, rangeLimit, 1, new Slope(1, 1), new Slope(0, 1));
 		}
@@ -364,7 +364,7 @@ class AdamMilVisibility extends Visibility {
 					// there's no point in incrementing topY even if light passes through the corner of the tile above. so we
 					// might as well use the bottom center for both cases.
 					let ax = x * 2; // center
-					if (this.BlocksLight(x + 1, topY + 1, octant, origin)) ax++; // use bottom-right if the tile above and right is a wall
+				if (this.blocksLight(x + 1, topY + 1, octant, origin)) ax++; // use bottom-right if the tile above and right is a wall
 					if (top.greater(topY * 2 + 1, ax)) topY++;
 				}
 			}
@@ -510,7 +510,7 @@ class DiamondWallsVisibility extends Visibility {
 
 	compute(origin, rangeLimit)
 	{
-		this.fnSetVisible(origin.X, origin.Y);
+		this.fnSetVisible(origin.x, origin.y);
 		for(let octant=0; octant<8; octant++) {
 			this.computeOctant(octant, origin, rangeLimit, 1, new Slope(1, 1), new Slope(0, 1));
 		}
@@ -567,7 +567,7 @@ class DiamondWallsVisibility extends Visibility {
 		  // it opaque to prevent the code below from moving the top vector up or the bottom vector down
 		  if(isOpaque &&
 			 (y == topY && top.lessOrEqual(y*2-1, x*2) && !this.blocksLight(x, y-1, octant, origin) ||
-			  y == bottomY && bottom.greaterOrEqual(y*2+1, x*2) && !this.locksLight(x, y+1, octant, origin)))
+			  y == bottomY && bottom.greaterOrEqual(y*2+1, x*2) && !this.blocksLight(x, y+1, octant, origin)))
 		  {
 			isOpaque = false;
 		  }

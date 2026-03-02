@@ -117,7 +117,6 @@ function findPath(map, startX, startY, endX, endY) {
 		  path.push(current);
 		  if (current.x == startX && current.y == startY) {
 			return path;
-			break;
 		  }
 		  current = current.cameFrom;
 		}

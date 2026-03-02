@@ -105,7 +105,6 @@ class Player {
 
 				if (!traceTile.isTransparent()) {
 					break;
-					blocked = true;
 				}
 			}
 			// if (!blocked) {

@@ -2,11 +2,11 @@
  *  Adapted from https://github.com/domasx2/mrpas-js/blob/master/mrpas.js
  */
 
-function createMRPASVisibility(){
+function createMRPASVisibility(floorPlan){
     return new MRPAS(
-        (x,y) => { return !game.state.currentFloor().get(x, y).isTransparent(); },
-        (x,y) => { game.state.currentFloor().get(x, y).hasLineOfSight = true; },
-        (x,y) => { return game.state.currentFloor().get(x, y).hasLineOfSight; },
+        (x,y) => { return !floorPlan.get(x, y).isTransparent(); },
+        (x,y) => { floorPlan.get(x, y).hasLineOfSight = true; },
+        (x,y) => { return floorPlan.get(x, y).hasLineOfSight; },
         (x,y) => { return Math.sqrt(x ** 2 + y ** 2); }
     );
 }

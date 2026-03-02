@@ -797,7 +797,7 @@ class Spiderweb extends Tile {
 
 	constructor(x, y) {
 		super(x, y);
-		this.strength = MAX_SPIDERWEB_STRENGTH;
+		this.strength = this.MAX_SPIDERWEB_STRENGTH;
 	}
 
 	isEnterable() {
@@ -838,7 +838,7 @@ class AscendingStaircase extends Tile {
 		return true;
 	}
 
-	onEnter() {
+	onEnter(player) {
 		// Go up a floor
 		player.timeUnderwater = 0;
 	}
@@ -854,7 +854,7 @@ class DescendingStaircase extends Tile {
 		return true;
 	}
 
-	onEnter() {
+	onEnter(player) {
 		// Go down a floor
 		player.timeUnderwater = 0;
 	}

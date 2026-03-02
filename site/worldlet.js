@@ -18,7 +18,7 @@ class Worldlet {
 	}
 
 	async init() {
-		await this.generateFloors();
+		this.floors = await this.generateFloors();
 		this.inputEngine.init();
 		this.displayEngine.init();
 	}
