@@ -13,28 +13,29 @@ function render() {
 }
 
 function drawFloorPlan() {
-	let floorPlan = gameState.currentFloor().tiles;
+	let fp = gameState.currentFloor();
+	let floorPlan = fp.tiles;
 	for (let tile of floorPlan) {
 		tile.rendered = false;
 	}
 	allRenderedNeighbors = [];
 	for (let tile of floorPlan) {
 		if (tile.visible || ((RENDER_MODE == LINE_OF_SIGHT || RENDER_MODE == LINE_OF_SIGHT_PLUS) && tile.hasLineOfSight) || tile.hasBeenSeen) {
-			tile.render();
+			tileRenderer.renderTile(tile, fp);
 			if (tile.visible) {
 				tile.rendered = true;
 			}
 		} else if (RENDER_MODE == LINE_OF_SIGHT_PLUS && !tile.hasLineOfSight) {
-			tile.render();
+			tileRenderer.renderTile(tile, fp);
 			tile.rendered = true;
 		} 
 		if (tile.visible) {
-			let neighbors = gameState.currentFloor().getNeighbors(tile.x, tile.y);
+			let neighbors = fp.getNeighbors(tile.x, tile.y);
 			for (let neighbor of neighbors) {
 				if (!neighbor.visible) {
-					let t = gameState.currentFloor().get(neighbor.x, neighbor.y);
+					let t = fp.get(neighbor.x, neighbor.y);
 					if (!t.rendered) {
-						t.render(true);
+						tileRenderer.renderTile(t, fp, true);
 						t.rendered = true;
 						allRenderedNeighbors.push(t);
 					}
@@ -43,15 +44,15 @@ function drawFloorPlan() {
 		}
 	}
 	for (let t of allRenderedNeighbors) {
-		let neighbors = gameState.currentFloor().getNeighbors(t.x, t.y);
+		let neighbors = fp.getNeighbors(t.x, t.y);
 		for (let neighbor of neighbors) {
-			let tt = gameState.currentFloor().get(neighbor.x, neighbor.y);
+			let tt = fp.get(neighbor.x, neighbor.y);
 			if (!tt.visible && !tt.rendered) {
-				let moreNeighbors = gameState.currentFloor().getNeighbors(tt.x, tt.y);
+				let moreNeighbors = fp.getNeighbors(tt.x, tt.y);
 				let cornerColors = [BACKGROUND_COLOR, BACKGROUND_COLOR, BACKGROUND_COLOR, BACKGROUND_COLOR];
 				let black = [0, 0, 0];
 				for (let n of moreNeighbors) {
-					let ttt = gameState.currentFloor().get(n.x, n.y);
+					let ttt = fp.get(n.x, n.y);
 					if (!ttt.visible && ttt.rendered) {
 						let dx = ttt.x - tt.x;
 						let dy = ttt.y - tt.y;
@@ -79,18 +80,8 @@ function drawFloorPlan() {
 					}
 				}
 
-				beginShape(TESS);
-				fill(cornerColors[0]);
-				noStroke();
-				vertex(tt.x * GRID_SIZE_X, tt.y * GRID_SIZE_Y);
-				fill(cornerColors[1]);
-				vertex((tt.x + 1) * GRID_SIZE_X, tt.y * GRID_SIZE_Y);
-				fill(cornerColors[2]);
-				vertex((tt.x + 1) * GRID_SIZE_X, (tt.y + 1) * GRID_SIZE_Y);
-				fill(cornerColors[3]);
-				vertex(tt.x * GRID_SIZE_X, (tt.y + 1) * GRID_SIZE_Y);
-				endShape(CLOSE);
-				tt.render(false, true);
+				tileRenderer.renderGradientQuad(tt.x, tt.y, cornerColors);
+				tileRenderer.renderTile(tt, fp, false, true);
 			}
 		}
 	}
@@ -180,10 +171,11 @@ function drawPlayer() {
 }
 
 function drawEnemies() {
-	for (let monster of gameState.currentFloor().monsters) {
-		tile = gameState.currentFloor().get(monster.x, monster.y);
+	let fp = gameState.currentFloor();
+	for (let monster of fp.monsters) {
+		let tile = fp.get(monster.x, monster.y);
 		if (tile.visible) {
-			monster.draw();
+			tileRenderer.renderMonster(monster, fp);
 		}
 	}
 }
