@@ -14,7 +14,6 @@ class Monster {
 		this.y = 0;
 		this.targetX = null;
 		this.targetY = null;
-		this.wasVisible = false;
 	}
 
 	canSeeTile(tile) {
